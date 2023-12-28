@@ -1,6 +1,7 @@
-.idea/
-discord-forms.iml
+# Environment files
+src/test/resources/example-bot.properties
 
+# Maven & build
 target/
 pom.xml.tag
 pom.xml.releaseBackup
@@ -12,6 +13,10 @@ buildNumber.properties
 .mvn/timing.properties
 # https://github.com/takari/maven-wrapper#usage-without-binary-jar
 .mvn/wrapper/maven-wrapper.jar
+
+# IntelliJ
+.idea/
+discord-forms.iml
 
 # Eclipse m2e generated files
 # Eclipse Core
