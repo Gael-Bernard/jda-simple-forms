@@ -1,3 +1,6 @@
+.idea/
+discord-forms.iml
+
 target/
 pom.xml.tag
 pom.xml.releaseBackup
