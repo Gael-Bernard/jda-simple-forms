@@ -10,17 +10,15 @@ import java.util.List;
 @AllArgsConstructor
 public class Form {
 
-  public static long EMPTY_MESSAGE_ID_VALUE = -1;
+  public static long EMPTY_ID_VALUE = -1;
 
   private @NonNull List<Question<?>> questions;
   private Question<?> currentQuestion;
   @Builder.Default
-  private long messageId = EMPTY_MESSAGE_ID_VALUE;
+  private long userId = EMPTY_ID_VALUE;
+  @Builder.Default
+  private long messageId = EMPTY_ID_VALUE;
   @Builder.Default
   private boolean ephemeral = MessageGlobalParams.DEFAULT_IS_EPHEMERAL;
-
-  public boolean isMessageIdDefined() {
-    return this.messageId != EMPTY_MESSAGE_ID_VALUE;
-  }
 
 }

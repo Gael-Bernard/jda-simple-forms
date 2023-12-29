@@ -16,6 +16,7 @@ public class FormStartService {
     Question<?> question = discordForm.getQuestions().get(0);
     discordForm.setMessageId(command.getIdLong());
     discordForm.setCurrentQuestion(question);
+    discordForm.setUserId(command.getUser().getIdLong());
     ongoingFormsRepository.save(discordForm);
 
     command

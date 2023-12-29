@@ -1,11 +1,15 @@
 package fr.gbernard.jdaforms.controller;
 
+import fr.gbernard.jdaforms.controller.template.EmbedColor;
+import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
 import fr.gbernard.jdaforms.model.Form;
 import fr.gbernard.jdaforms.repository.OngoingFormsRepository;
 import fr.gbernard.jdaforms.service.FormContinueService;
+import fr.gbernard.jdaforms.service.PermissionService;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,13 +25,22 @@ public class JdaFormsEventListener extends ListenerAdapter {
     final List<String> answer = List.of( event.getButton().getId() );
     final InteractionHook hook = event.getHook();
 
-    Optional<Form> formOpt = ongoingFormsRepository.getById(interactionId);
-    if(formOpt.isEmpty()) {
+    Form form;
+    {
+      Optional<Form> formOpt = ongoingFormsRepository.getById(interactionId);
+      if(formOpt.isEmpty()) { return; }
+      form = formOpt.get();
+    }
+
+    if(!PermissionService.userAllowedAnswer(event.getMember().getIdLong(), form)) {
+      event.reply(MessageCreateData.fromEmbeds( EmbedTemplate.basic("\uD83D\uDEAB Permission denied", "", EmbedColor.ERROR) ))
+          .setEphemeral(true)
+          .queue();
       return;
     }
 
     event.deferEdit().queue();
-    formContinueService.continueForm(formOpt.get(), answer, hook);
+    formContinueService.continueForm(form, answer, hook);
   }
 
   /*
