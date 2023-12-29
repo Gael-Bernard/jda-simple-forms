@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.utils.messages.MessageEditData;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Builder
 @Getter @Setter
@@ -34,6 +35,8 @@ public class YesNoQuestion implements Question<Boolean> {
 
     @Builder.Default
     private @NonNull Optional<Boolean> answer = Optional.empty();
+    @Builder.Default
+    private @NonNull Function<Form, Optional<Question<?>>> optionalNextQuestion = form -> Optional.empty();
 
     @Override
     public void editQuestionMessage(InteractionHook hookToMessage, Form form) {

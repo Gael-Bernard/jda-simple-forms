@@ -2,7 +2,7 @@ package fr.gbernard.jdaforms.utils;
 
 public class ExceptionUtils {
 
-  public static <T> void uncheck(ExceptionRunner<T> fun) {
+  public static void uncheck(ExceptionRunner fun) {
     try {
       fun.run();
     }
@@ -11,8 +11,20 @@ public class ExceptionUtils {
     }
   }
 
-  public interface ExceptionRunner<T> {
-    public void run() throws Exception;
+  public static <T> T uncheck(ExceptionSupplier<T> supplier) {
+    try {
+      return supplier.get();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public interface ExceptionRunner {
+    void run() throws Exception;
+  }
+
+  public interface ExceptionSupplier<T> {
+    T get() throws Exception;
   }
 
 }

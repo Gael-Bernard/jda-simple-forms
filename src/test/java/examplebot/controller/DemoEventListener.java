@@ -5,7 +5,6 @@ import fr.gbernard.jdaforms.controller.messagedata.EmbedColor;
 import fr.gbernard.jdaforms.controller.messagedata.EmbedMessageDataGenerator;
 import fr.gbernard.jdaforms.controller.question.yesno.YesNoQuestion;
 import fr.gbernard.jdaforms.model.Form;
-import fr.gbernard.jdaforms.model.Question;
 import fr.gbernard.jdaforms.service.FormStartService;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -27,6 +26,17 @@ public class DemoEventListener extends ListenerAdapter {
               YesNoQuestion.builder()
                   .key("accept-fill-form")
                   .title("Do you want to continue?")
+                  .build(),
+
+              YesNoQuestion.builder()
+                  .key("like-jdasf")
+                  .title("Do you like the JDA Simple Forms?")
+                  .subtitle("Don't worry, the dev will never know what you answered ;)")
+                  .build(),
+
+              YesNoQuestion.builder()
+                  .key("healthy_food")
+                  .title("Do you eat healthily? :medical_symbol:")
                   .build()
 
           )).ephemeral(true).build();

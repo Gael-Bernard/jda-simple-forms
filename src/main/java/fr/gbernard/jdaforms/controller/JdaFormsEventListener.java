@@ -1,18 +1,36 @@
 package fr.gbernard.jdaforms.controller;
 
+import fr.gbernard.jdaforms.model.Form;
+import fr.gbernard.jdaforms.repository.OngoingFormsRepository;
+import fr.gbernard.jdaforms.service.FormContinueService;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.InteractionHook;
+
+import java.util.List;
+import java.util.Optional;
 
 public class JdaFormsEventListener extends ListenerAdapter {
 
-  /*
+  private final FormContinueService formContinueService = new FormContinueService();
+  private final OngoingFormsRepository ongoingFormsRepository = new OngoingFormsRepository();
 
   @Override
-  public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
-    InteractionHook hook = event.getHook();
-    long interactionId = event.getMessage().getInteraction().getIdLong();
+  public void onButtonInteraction(ButtonInteractionEvent event) {
+    final long interactionId = event.getMessage().getInteraction().getIdLong();
+    final List<String> answer = List.of( event.getButton().getId() );
+    final InteractionHook hook = event.getHook();
+
+    Optional<Form> formOpt = ongoingFormsRepository.getById(interactionId);
+    if(formOpt.isEmpty()) {
+      return;
+    }
+
     event.deferEdit().queue();
-    evaluateStringsAndNext(interactionId, hook, List.of( event.getButton().getId() ) );
+    formContinueService.continueForm(formOpt.get(), answer, hook);
   }
+
+  /*
 
   @Override
   public void onStringSelectInteraction(StringSelectInteractionEvent event) {
