@@ -1,24 +1,29 @@
 package examplebot.controller;
 
-import examplebot.DemoApplication;
-import fr.gbernard.jdaforms.controller.messagedata.EmbedColor;
-import fr.gbernard.jdaforms.controller.messagedata.EmbedMessageDataGenerator;
 import fr.gbernard.jdaforms.controller.question.yesno.YesNoQuestion;
+import fr.gbernard.jdaforms.controller.template.EmbedColor;
+import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
 import fr.gbernard.jdaforms.model.Form;
 import fr.gbernard.jdaforms.service.FormStartService;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.util.List;
 
 public class DemoEventListener extends ListenerAdapter {
 
-  FormStartService formStartService = new FormStartService();
+  private final FormStartService formStartService = new FormStartService();
 
   @Override
-  public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
+  public void onSlashCommandInteraction(SlashCommandInteractionEvent commandEvent) {
+    final String commandName = commandEvent.getName();
 
-    if(event.getName().equals(DemoApplication.TEST_X_YES_NO_COMMANDNAME)) {
+    /*
+    Multiple Yes/No questions
+    Ephemeral messages (only visible by answering user)
+     */
+    if(commandName.equals("testyesno")) {
 
       Form form = Form.builder()
           .questions(List.of(
@@ -41,16 +46,39 @@ public class DemoEventListener extends ListenerAdapter {
 
           )).ephemeral(true).build();
 
-      formStartService.startForm(event, form);
+      formStartService.startForm(commandEvent, form);
 
     }
 
+    /*
+    Single Yes/No question
+    Non-ephemeral message (visible from everyone, default value)
+     */
+    else if(commandName.equals("testoneyesno")) {
+
+      Form form = Form.builder()
+          .questions(List.of(
+              YesNoQuestion.builder()
+                  .key("single-yes-no-question")
+                  .title("Please press \"SHUT UP AND TAKE MY MONEY!\" now")
+                  .yesLabel("SHUT UP AND TAKE MY MONEY!")
+                  .noLabel("Not interested, sorry")
+                  .build()
+          )).build();
+
+      formStartService.startForm(commandEvent, form);
+
+    }
+
+    /*
+    Command not found
+     */
     else {
-      event
-          .reply(EmbedMessageDataGenerator.basicCreate(
+      commandEvent
+          .reply( MessageCreateData.fromEmbeds(EmbedTemplate.basic(
               "Error: Command not found",
               "A technical problem has occurred with the bot. Please retry later.",
-              EmbedColor.ERROR))
+              EmbedColor.ERROR)))
           .setEphemeral(true)
           .queue();
     }

@@ -1,4 +1,4 @@
-package fr.gbernard.jdaforms.controller.messagedata;
+package fr.gbernard.jdaforms.controller.template;
 
 public final class MessageGlobalParams {
 

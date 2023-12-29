@@ -1,6 +1,6 @@
 package fr.gbernard.jdaforms.model;
 
-import fr.gbernard.jdaforms.controller.messagedata.MessageGlobalParams;
+import fr.gbernard.jdaforms.controller.template.MessageGlobalParams;
 import lombok.*;
 
 import java.util.List;

@@ -12,9 +12,6 @@ import java.util.List;
 
 public class DemoApplication {
 
-  public static String TEST_1_YES_NO_COMMANDNAME = "testoneyesno";
-  public static String TEST_X_YES_NO_COMMANDNAME = "testyesno";
-
   private static final PropertiesService propertiesService = new PropertiesService();
 
   public static void main(String... args) throws InterruptedException {
@@ -30,8 +27,8 @@ public class DemoApplication {
         .build();
 
     jda.updateCommands().addCommands(
-        Commands.slash(TEST_1_YES_NO_COMMANDNAME, "Triggers a single Yes/No question"),
-        Commands.slash(TEST_X_YES_NO_COMMANDNAME, "Triggers multiple Yes/No questions in a row")
+        Commands.slash("testoneyesno", "Triggers a single Yes/No question"),
+        Commands.slash("testyesno", "Triggers multiple Yes/No questions in a row")
     ).queue();
 
     jda.awaitReady();
