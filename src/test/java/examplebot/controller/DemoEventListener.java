@@ -64,7 +64,12 @@ public class DemoEventListener extends ListenerAdapter {
                   .yesLabel("SHUT UP AND TAKE MY MONEY!")
                   .noLabel("Not interested, sorry")
                   .build()
-          )).build();
+          ))
+          .onFormComplete((answers, completeForm) -> {
+            final boolean answer = answers.getAsBoolean("single-yes-no-question");
+            System.out.println("User has selected button: "+answer);
+          })
+          .build();
 
       formStartService.startForm(commandEvent, form);
 

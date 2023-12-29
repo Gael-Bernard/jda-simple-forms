@@ -2,12 +2,15 @@ package fr.gbernard.jdaforms.service;
 
 import fr.gbernard.jdaforms.controller.action.EditMessage;
 import fr.gbernard.jdaforms.model.Form;
+import fr.gbernard.jdaforms.model.FormAnswersMap;
 import fr.gbernard.jdaforms.model.Question;
 import fr.gbernard.jdaforms.utils.ExceptionUtils;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class FormContinueService {
 
@@ -21,9 +24,7 @@ public class FormContinueService {
       ExceptionUtils.uncheck(() -> nextQuestion.editQuestionMessage(hook, form) );
     }
     else {
-      form.setCurrentQuestion(null);
-      EditMessage.text(hook, "✅ **DONE, THANK YOU!**");
-      // TODO : Final summary
+      this.triggerFormComplete(form, hook);
     }
   }
 
@@ -51,6 +52,17 @@ public class FormContinueService {
     }
 
     return Optional.of( questions.get(currentQuestionIndex+1) );
+  }
+
+  private void triggerFormComplete(Form form, InteractionHook hook) {
+
+    final Map<String, Object> answersMap = form.getQuestions().stream()
+        .filter(question -> question.getAnswer().isPresent())
+        .collect(Collectors.toMap(q -> q.getKey(), q -> q.getAnswer().get()));
+    form.getOnFormComplete().accept( new FormAnswersMap(answersMap), form);
+
+    EditMessage.text(hook, "✅ **DONE, THANK YOU!**");
+    // TODO : Final summary
   }
 
 }
