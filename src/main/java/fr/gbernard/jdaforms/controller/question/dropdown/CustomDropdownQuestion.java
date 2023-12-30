@@ -27,7 +27,6 @@ public class CustomDropdownQuestion<T extends DropdownItem> implements Question<
     private @NonNull final String title;
     private final String subtitle;
 
-
     @Builder.Default
     private @NonNull Optional<T> answer = Optional.empty();
     @Builder.Default

@@ -6,7 +6,6 @@ import lombok.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * Describes a form consisting of multiple questions
@@ -31,9 +30,8 @@ public class Form {
   /**
    * Question currently waiting for an answer from the user
    */
-  private Question<?> currentQuestion;
-
-
+  @Builder.Default
+  private @NonNull Optional<Question<?>> currentQuestion = Optional.empty();
 
   /**
    * Unique ID of the user supposed to answer this question<br>
@@ -63,7 +61,7 @@ public class Form {
 
   /**
    * Finds a question by key
-   * @param key
+   * @param key key given at form creation
    * @return matching question if any
    */
   public Optional<Question<?>> findQuestionByKey(String key) {

@@ -4,6 +4,7 @@ import fr.gbernard.jdaforms.controller.action.EditMessage;
 import fr.gbernard.jdaforms.model.Form;
 import fr.gbernard.jdaforms.model.FormAnswersMap;
 import fr.gbernard.jdaforms.model.Question;
+import fr.gbernard.jdaforms.repository.OngoingFormsRepository;
 import fr.gbernard.jdaforms.utils.ExceptionUtils;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 
@@ -14,35 +15,55 @@ import java.util.stream.Collectors;
 
 public class FormContinueService {
 
-  public void continueForm(Form form, List<String> answer, InteractionHook hook) {
-    form.getCurrentQuestion().parseAndSetAnswer(answer);
-    var nextQuestionStatus = goToNextQuestion(form);
+  final OngoingFormsRepository ongoingFormsRepository = new OngoingFormsRepository();
 
-    switch (nextQuestionStatus) {
-      case NEXT_QUESTION:
-        ExceptionUtils.uncheck(() -> form.getCurrentQuestion().editQuestionMessage(hook, form) );
-        break;
-      case NO_MORE_QUESTION:
-        this.triggerFormComplete(form, hook);
-        break;
+  public void setAnswerInForm(Form form, List<String> answer) {
+    form.getCurrentQuestion()
+        .orElseThrow(IllegalStateException::new)
+        .parseAndSetAnswer(answer);
+  }
+
+  public void sendCurrentQuestionOrEnd(Form form, InteractionHook hook) {
+    if(form.getCurrentQuestion().isPresent()) {
+      ExceptionUtils.uncheck(() -> form.getCurrentQuestion().get().editQuestionMessage(hook, form) );
+    }
+    else {
+      this.triggerFormComplete(form, hook);
     }
   }
 
-  public static GoToNextQuestionResult goToNextQuestion(Form form) {
-    Optional<Question<?>> nextQuestionOpt = getNextQuestion(form);
+  public void triggerFormComplete(Form form, InteractionHook hook) {
 
-    if(nextQuestionOpt.isEmpty()) {
-      form.setCurrentQuestion(null);
-      return GoToNextQuestionResult.NO_MORE_QUESTION;
+    final Map<String, Object> answersMap = form.getQuestions().stream()
+        .filter(question -> question.getAnswer().isPresent())
+        .collect(Collectors.toMap(Question::getKey, q -> q.getAnswer().get()));
+    form.getOnFormComplete().accept( new FormAnswersMap(answersMap), form);
+
+    EditMessage.text(hook, "✅ **DONE, THANK YOU!**");
+    // TODO : Final summary
+  }
+
+  public void saveOrDeleteForm(Form form) {
+    if(form.getCurrentQuestion().isPresent()) {
+      ongoingFormsRepository.save(form);
     }
+    else {
+      ongoingFormsRepository.delete(form);
+    }
+  }
 
-    Question<?> nextQuestion = nextQuestionOpt.get();
-    form.setCurrentQuestion(nextQuestion);
-    return GoToNextQuestionResult.NEXT_QUESTION;
+  public static void updateFormToNextQuestion(Form form) {
+    form.setCurrentQuestion( getNextQuestion(form) );
   }
 
   public static Optional<Question<?>> getNextQuestion(Form form) {
-    Question<?> currentQuestion = form.getCurrentQuestion();
+
+    Question<?> currentQuestion;
+    {
+      Optional<Question<?>> questionOpt = form.getCurrentQuestion();
+      if(questionOpt.isEmpty()) { return Optional.empty(); }
+      currentQuestion = questionOpt.get();
+    }
 
     final Optional<Question<?>> additionalSubquestion = currentQuestion.getOptionalNextQuestion().apply(form);
     if(additionalSubquestion.isPresent()) {
@@ -58,29 +79,17 @@ public class FormContinueService {
   }
 
   private static Optional<Question<?>> getNextQuestionInOrder(Form form) {
+    if(form.getCurrentQuestion().isEmpty()) {
+      return Optional.empty();
+    }
+
     final List<Question<?>> questions = form.getQuestions();
-    final int currentQuestionIndex = questions.indexOf( form.getCurrentQuestion() );
+    final int currentQuestionIndex = questions.indexOf( form.getCurrentQuestion().get() );
     if(currentQuestionIndex+1 == questions.size()) {
       return Optional.empty();
     }
 
     return Optional.of( questions.get(currentQuestionIndex+1) );
-  }
-
-  private static void triggerFormComplete(Form form, InteractionHook hook) {
-
-    final Map<String, Object> answersMap = form.getQuestions().stream()
-        .filter(question -> question.getAnswer().isPresent())
-        .collect(Collectors.toMap(q -> q.getKey(), q -> q.getAnswer().get()));
-    form.getOnFormComplete().accept( new FormAnswersMap(answersMap), form);
-
-    EditMessage.text(hook, "✅ **DONE, THANK YOU!**");
-    // TODO : Final summary
-  }
-
-  public enum GoToNextQuestionResult {
-    NEXT_QUESTION,
-    NO_MORE_QUESTION
   }
 
 }
