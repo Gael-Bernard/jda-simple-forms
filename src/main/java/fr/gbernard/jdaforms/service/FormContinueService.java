@@ -16,19 +16,32 @@ public class FormContinueService {
 
   public void continueForm(Form form, List<String> answer, InteractionHook hook) {
     form.getCurrentQuestion().parseAndSetAnswer(answer);
+    var nextQuestionStatus = goToNextQuestion(form);
 
-    Optional<Question<?>> nextQuestionOpt = this.getNextQuestion(form);
-    if(nextQuestionOpt.isPresent()) {
-      Question<?> nextQuestion = nextQuestionOpt.get();
-      form.setCurrentQuestion(nextQuestion);
-      ExceptionUtils.uncheck(() -> nextQuestion.editQuestionMessage(hook, form) );
-    }
-    else {
-      this.triggerFormComplete(form, hook);
+    switch (nextQuestionStatus) {
+      case NEXT_QUESTION:
+        ExceptionUtils.uncheck(() -> form.getCurrentQuestion().editQuestionMessage(hook, form) );
+        break;
+      case NO_MORE_QUESTION:
+        this.triggerFormComplete(form, hook);
+        break;
     }
   }
 
-  public Optional<Question<?>> getNextQuestion(Form form) {
+  public static GoToNextQuestionResult goToNextQuestion(Form form) {
+    Optional<Question<?>> nextQuestionOpt = getNextQuestion(form);
+
+    if(nextQuestionOpt.isEmpty()) {
+      form.setCurrentQuestion(null);
+      return GoToNextQuestionResult.NO_MORE_QUESTION;
+    }
+
+    Question<?> nextQuestion = nextQuestionOpt.get();
+    form.setCurrentQuestion(nextQuestion);
+    return GoToNextQuestionResult.NEXT_QUESTION;
+  }
+
+  public static Optional<Question<?>> getNextQuestion(Form form) {
     Question<?> currentQuestion = form.getCurrentQuestion();
 
     final Optional<Question<?>> additionalSubquestion = currentQuestion.getOptionalNextQuestion().apply(form);
@@ -44,7 +57,7 @@ public class FormContinueService {
     return Optional.empty();
   }
 
-  private Optional<Question<?>> getNextQuestionInOrder(Form form) {
+  private static Optional<Question<?>> getNextQuestionInOrder(Form form) {
     final List<Question<?>> questions = form.getQuestions();
     final int currentQuestionIndex = questions.indexOf( form.getCurrentQuestion() );
     if(currentQuestionIndex+1 == questions.size()) {
@@ -54,7 +67,7 @@ public class FormContinueService {
     return Optional.of( questions.get(currentQuestionIndex+1) );
   }
 
-  private void triggerFormComplete(Form form, InteractionHook hook) {
+  private static void triggerFormComplete(Form form, InteractionHook hook) {
 
     final Map<String, Object> answersMap = form.getQuestions().stream()
         .filter(question -> question.getAnswer().isPresent())
@@ -63,6 +76,11 @@ public class FormContinueService {
 
     EditMessage.text(hook, "✅ **DONE, THANK YOU!**");
     // TODO : Final summary
+  }
+
+  public enum GoToNextQuestionResult {
+    NEXT_QUESTION,
+    NO_MORE_QUESTION
   }
 
 }
