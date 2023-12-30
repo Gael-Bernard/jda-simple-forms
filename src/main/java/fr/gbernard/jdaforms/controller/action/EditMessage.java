@@ -7,8 +7,16 @@ import net.dv8tion.jda.api.utils.messages.MessageEditData;
 
 import java.util.List;
 
+/**
+ * Util methods to override all the elements of a message
+ */
 public class EditMessage {
 
+  /**
+   * Edits message to base text
+   * @param hook message to be edited
+   * @param text text to be printed
+   */
   public static void text(InteractionHook hook, String text) {
     hook
         .editOriginal(text)
@@ -18,6 +26,12 @@ public class EditMessage {
         .queue();
   }
 
+  /**
+   * Edits message to an embed with item components (buttons)
+   * @param hook hook to the message to be edited
+   * @param embed embed to insert
+   * @param itemComponents item components to insert
+   */
   public static void embedAndItemComponents(InteractionHook hook, MessageEmbed embed, List<ItemComponent> itemComponents) {
     hook
         .editOriginal(MessageEditData.fromEmbeds(embed))
