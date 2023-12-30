@@ -7,6 +7,7 @@ import fr.gbernard.jdaforms.repository.OngoingFormsRepository;
 import fr.gbernard.jdaforms.service.FormContinueService;
 import fr.gbernard.jdaforms.service.PermissionService;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
@@ -32,7 +33,30 @@ public class JdaFormsEventListener extends ListenerAdapter {
       form = formOpt.get();
     }
 
-    if(!PermissionService.userAllowedAnswer(event.getMember().getIdLong(), form)) {
+    if(!PermissionService.userAllowedAnswer(event.getUser().getIdLong(), form)) {
+      event.reply(MessageCreateData.fromEmbeds( EmbedTemplate.basic("\uD83D\uDEAB Permission denied", "", EmbedColor.ERROR) ))
+          .setEphemeral(true)
+          .queue();
+      return;
+    }
+
+    event.deferEdit().queue();
+    formContinueService.continueForm(form, answer, hook);
+  }
+
+  public void onStringSelectInteraction(StringSelectInteractionEvent event) {
+    final long interactionId = event.getMessage().getInteraction().getIdLong();
+    final List<String> answer = event.getValues();
+    final InteractionHook hook = event.getHook();
+
+    Form form;
+    {
+      Optional<Form> formOpt = ongoingFormsRepository.getById(interactionId);
+      if(formOpt.isEmpty()) { return; }
+      form = formOpt.get();
+    }
+
+    if(!PermissionService.userAllowedAnswer(event.getUser().getIdLong(), form)) {
       event.reply(MessageCreateData.fromEmbeds( EmbedTemplate.basic("\uD83D\uDEAB Permission denied", "", EmbedColor.ERROR) ))
           .setEphemeral(true)
           .queue();
@@ -44,14 +68,6 @@ public class JdaFormsEventListener extends ListenerAdapter {
   }
 
   /*
-
-  @Override
-  public void onStringSelectInteraction(StringSelectInteractionEvent event) {
-    InteractionHook hook = event.getHook();
-    long interactionId = event.getMessage().getInteraction().getIdLong();
-    event.deferEdit().queue();
-    evaluateStringsAndNext(interactionId, hook, event.getValues());
-  }
 
   @Override
   public void onEntitySelectInteraction(EntitySelectInteractionEvent event) {
