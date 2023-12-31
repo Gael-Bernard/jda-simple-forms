@@ -21,27 +21,33 @@ import java.util.function.Function;
 @Getter @Setter
 @Builder
 @AllArgsConstructor
-public class ChannelDropdownQuestion implements Question<GuildChannel> {
+public class ChannelDropdownQuestion implements Question<List<GuildChannel>> {
 
   private @NonNull String key;
   private @NonNull final String title;
   private final String subtitle;
 
   @Builder.Default
-  private @NonNull Optional<GuildChannel> answer = Optional.empty();
+  private int minSelectedItems = 1;
+  @Builder.Default
+  private int maxSelectedItems = 1;
+  @Builder.Default
+  private @NonNull Optional<List<GuildChannel>> answer = Optional.empty();
   @Builder.Default
   private @NonNull Function<Form, Optional<Question<?>>> optionalNextQuestion = form -> Optional.empty();
 
   @Override
   public void editQuestionMessage(InteractionHook hookToMessage, Form form) {
     final MessageEmbed embed = EmbedTemplate.basic(title, subtitle, EmbedColor.NEUTRAL);
-    final EntitySelectMenu dropdownOptions =
-        EntitySelectMenu.create(key, EntitySelectMenu.SelectTarget.CHANNEL).build();
+    final EntitySelectMenu dropdownOptions = EntitySelectMenu
+        .create(key, EntitySelectMenu.SelectTarget.CHANNEL)
+        .setRequiredRange(minSelectedItems, maxSelectedItems)
+        .build();
     EditMessage.embedAndItemComponents(hookToMessage, embed, List.of(dropdownOptions) );
   }
 
   @Override
-  public GuildChannel parseAnswer(List<String> discordReturnedValues) {
+  public List<GuildChannel> parseAnswer(List<String> discordReturnedValues) {
     throw new UnsupportedOperationException("JDA entities (users, channels, etc.) are not supposed to be parsed.");
   }
 

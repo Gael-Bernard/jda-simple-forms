@@ -9,7 +9,6 @@ import fr.gbernard.jdaforms.service.FormContinueService;
 import fr.gbernard.jdaforms.service.PermissionService;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionEvent;
@@ -106,16 +105,13 @@ public class JdaFormsEventListener extends ListenerAdapter {
     final Question<?> currentQuestion = form.getCurrentQuestion().orElseThrow(IllegalStateException::new);
 
     if(!users.isEmpty()) {
-      final Optional<User> user = Optional.of( users.get(0) );
-      ((Question<User>) currentQuestion).setAnswer(user);
+      ((Question<List<User>>) currentQuestion).setAnswer( Optional.of(users) );
     }
     else if(!channels.isEmpty()) {
-      final Optional<Channel> channel = Optional.of( channels.get(0) );
-      ((Question<Channel>) currentQuestion).setAnswer(channel);
+      ((Question<List<GuildChannel>>) currentQuestion).setAnswer( Optional.of(channels) );
     }
     else if(!roles.isEmpty()) {
-      final Optional<Role> role = Optional.of( roles.get(0) );
-      ((Question<Role>) currentQuestion).setAnswer(role);
+      ((Question<List<Role>>) currentQuestion).setAnswer( Optional.of(roles) );
     }
     else {
       throw new IllegalArgumentException("Expected a user, channel or role, while none of these is available");

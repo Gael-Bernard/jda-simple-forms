@@ -17,9 +17,11 @@ public class AllDropdownQuestionsForm {
 
             CustomDropdownQuestion.builder()
                 .key("favourite-vegetable")
-                .title("What is your favourite vegetable?")
+                .title("What are your 2-3 favourite vegetables?")
                 .subtitle("We hope you eat vegetables on a daily basis for your health!")
                 .choices( List.of(Vegetable.values()) )
+                .minSelectedItems(2)
+                .maxSelectedItems(3)
                 .parser( Vegetable::parse )
                 .build(),
 
@@ -33,12 +35,16 @@ public class AllDropdownQuestionsForm {
                 .key("easter-eggs-location")
                 .title("Pick where you want to leave the Easter Egg")
                 .subtitle("The Easter Egg will be hidden in one of the guild's channels!")
+                .minSelectedItems(2)
+                .maxSelectedItems(2)
                 .build(),
 
             RoleDropdownQuestion.builder()
                 .key("gift")
                 .title("Ask for a role as Christmas gift!")
                 .subtitle("It's Christmas, which role would you like to get? (I can't promise you're getting it!)")
+                .minSelectedItems(1)
+                .maxSelectedItems(1)
                 .build()
 
         ))

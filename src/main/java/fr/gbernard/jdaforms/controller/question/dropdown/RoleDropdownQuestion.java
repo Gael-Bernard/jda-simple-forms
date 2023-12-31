@@ -22,27 +22,33 @@ import java.util.function.Function;
 @Getter @Setter
 @Builder
 @AllArgsConstructor
-public class RoleDropdownQuestion implements Question<Role> {
+public class RoleDropdownQuestion implements Question<List<Role>> {
 
   private @NonNull String key;
   private @NonNull final String title;
   private final String subtitle;
 
   @Builder.Default
-  private @NonNull Optional<Role> answer = Optional.empty();
+  private int minSelectedItems = 1;
+  @Builder.Default
+  private int maxSelectedItems = 1;
+  @Builder.Default
+  private @NonNull Optional<List<Role>> answer = Optional.empty();
   @Builder.Default
   private @NonNull Function<Form, Optional<Question<?>>> optionalNextQuestion = form -> Optional.empty();
 
   @Override
   public void editQuestionMessage(InteractionHook hookToMessage, Form form) {
     final MessageEmbed embed = EmbedTemplate.basic(title, subtitle, EmbedColor.NEUTRAL);
-    final EntitySelectMenu dropdownOptions =
-        EntitySelectMenu.create(key, EntitySelectMenu.SelectTarget.ROLE).build();
+    final EntitySelectMenu dropdownOptions = EntitySelectMenu
+        .create(key, EntitySelectMenu.SelectTarget.ROLE)
+        .setRequiredRange(minSelectedItems, maxSelectedItems)
+        .build();
     EditMessage.embedAndItemComponents(hookToMessage, embed, List.of(dropdownOptions) );
   }
 
   @Override
-  public Role parseAnswer(List<String> discordReturnedValues) {
+  public List<Role> parseAnswer(List<String> discordReturnedValues) {
     throw new UnsupportedOperationException("JDA entities (users, channels, etc.) are not supposed to be parsed");
   }
 

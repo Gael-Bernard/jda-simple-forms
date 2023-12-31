@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Asks the user to pick one item among a list of strings
@@ -20,15 +21,19 @@ import java.util.function.Function;
  */
 @Builder
 @Getter @Setter
-@RequiredArgsConstructor
-public class CustomDropdownQuestion<T extends DropdownItem> implements Question<T> {
+@AllArgsConstructor
+public class CustomDropdownQuestion<T extends DropdownItem> implements Question<List<T>> {
 
     private @NonNull String key;
     private @NonNull final String title;
     private final String subtitle;
 
     @Builder.Default
-    private @NonNull Optional<T> answer = Optional.empty();
+    private int minSelectedItems = 1;
+    @Builder.Default
+    private int maxSelectedItems = 1;
+    @Builder.Default
+    private @NonNull Optional<List<T>> answer = Optional.empty();
     @Builder.Default
     private @NonNull Function<Form, Optional<Question<?>>> optionalNextQuestion = form -> Optional.empty();
 
@@ -49,11 +54,15 @@ public class CustomDropdownQuestion<T extends DropdownItem> implements Question<
         for(T choi : choices) {
             builder.addOption(choi.getLabel(), choi.getValue(), choi.getEmoji());
         }
-        return builder.build();
+        return builder
+            .setRequiredRange(minSelectedItems, maxSelectedItems)
+            .build();
     }
 
     @Override
-    public T parseAnswer(List<String> discordReturnedValues) throws IllegalArgumentException {
-        return parser.apply( discordReturnedValues.get(0) );
+    public List<T> parseAnswer(List<String> discordReturnedValues) throws IllegalArgumentException {
+        return discordReturnedValues.stream()
+            .map(parser::apply)
+            .collect(Collectors.toList());
     }
 }
