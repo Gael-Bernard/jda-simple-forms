@@ -34,7 +34,7 @@ public class FormContinueService {
 
   public void triggerFormComplete(Form form, InteractionHook hook) {
 
-    final Map<String, Object> answersMap = form.getMandatoryQuestions().stream()
+    final Map<String, Object> answersMap = form.getQuestionsHistory().stream()
         .filter(question -> question.getAnswer().isPresent())
         .collect(Collectors.toMap(Question::getKey, q -> q.getAnswer().get()));
     form.getOnFormComplete().accept( new FormAnswersMap(answersMap), form);
