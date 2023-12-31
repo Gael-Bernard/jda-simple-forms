@@ -1,6 +1,9 @@
 package fr.gbernard.jdaforms.model;
 
+import fr.gbernard.jdaforms.controller.defaultmessages.DefaultMessagesEditors;
 import fr.gbernard.jdaforms.controller.template.MessageGlobalParams;
+import fr.gbernard.jdaforms.exception.NoAnswerException;
+import fr.gbernard.jdaforms.exception.QuestionNotFoundException;
 import lombok.*;
 
 import java.util.List;
@@ -54,6 +57,12 @@ public class Form {
   private boolean ephemeral = MessageGlobalParams.DEFAULT_IS_EPHEMERAL;
 
   /**
+   * Edits the form message when the form is complete
+   */
+  @Builder.Default
+  private @NonNull FormMessageEditor finalMessage = DefaultMessagesEditors.formSent();
+
+  /**
    * Action to perform once the form is complete
    */
   @Builder.Default
@@ -62,12 +71,30 @@ public class Form {
   /**
    * Finds a question by key
    * @param key key given at form creation
+   * @param clazz expected type of the answer
    * @return matching question if any
+   * @throws QuestionNotFoundException if no question matches key
    */
-  public Optional<Question<?>> findQuestionByKey(String key) {
+  public <T> Question<T> findQuestionByKey(String key, Class<T> clazz) throws QuestionNotFoundException {
     return this.questions.stream()
         .filter(question -> question.getKey().equals(key))
-        .findAny();
+        .map(value -> (Question<T>) value)
+        .findAny()
+        .orElseThrow(() -> new QuestionNotFoundException("Form doesn't contain question with key: "+key));
+  }
+
+  /**
+   * Finds a question by key and retrieves its answer
+   * @param key key given at form creation
+   * @param clazz expected type of the answer
+   * @return matching answer if any
+   * @throws QuestionNotFoundException if no question matches key
+   * @throws NoAnswerException if the question was found but doesn't have an answer yet
+   */
+  public <T> T findAnswerByKey(String key, Class<T> clazz) throws QuestionNotFoundException, NoAnswerException {
+    return this.findQuestionByKey(key, clazz)
+        .getAnswer()
+        .orElseThrow(() -> new NoAnswerException("Question with key "+key+" doesn't have an answer"));
   }
 
 }

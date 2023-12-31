@@ -42,4 +42,18 @@ public class EditMessage {
         .queue();
   }
 
+  /**
+   *
+   * @param hook
+   * @param embed
+   */
+  public static void embed(InteractionHook hook, MessageEmbed embed) {
+    hook
+        .editOriginal(MessageEditData.fromEmbeds(embed))
+        .setContent("")
+        .setComponents(List.of())
+        .setAttachments(List.of())
+        .queue();
+  }
+
 }

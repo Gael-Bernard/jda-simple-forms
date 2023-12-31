@@ -1,6 +1,5 @@
 package fr.gbernard.jdaforms.service;
 
-import fr.gbernard.jdaforms.controller.action.EditMessage;
 import fr.gbernard.jdaforms.model.Form;
 import fr.gbernard.jdaforms.model.FormAnswersMap;
 import fr.gbernard.jdaforms.model.Question;
@@ -39,8 +38,7 @@ public class FormContinueService {
         .collect(Collectors.toMap(Question::getKey, q -> q.getAnswer().get()));
     form.getOnFormComplete().accept( new FormAnswersMap(answersMap), form);
 
-    EditMessage.text(hook, "✅ **DONE, THANK YOU!**");
-    // TODO : Final summary
+    ExceptionUtils.uncheck(() -> form.getFinalMessage().edit(hook, form) );
   }
 
   public void saveOrDeleteForm(Form form) {
