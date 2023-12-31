@@ -47,7 +47,7 @@ public class YesNoQuestionsForm {
     };
 
     return Form.builder()
-        .questions(List.of(question1, question2))
+        .mandatoryQuestions(List.of(question1, question2))
         .ephemeral(true)
         .finalMessage(finalMessage)
         .build();

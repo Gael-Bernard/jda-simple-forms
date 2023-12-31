@@ -5,6 +5,8 @@ import fr.gbernard.jdaforms.model.Question;
 
 import java.util.Optional;
 
+import static java.util.Optional.of;
+
 public class QuestionMocks {
 
   public static Question<Boolean> baseYesNoQuestion1() {
@@ -37,6 +39,18 @@ public class QuestionMocks {
         .title("Do you prefer camels over cats?")
         .subtitle("Please tell us if you prefer camels over cats")
         .build();
+  }
+
+  public static Question<Boolean> simpleSubquestion1() {
+    Question<Boolean> question = baseYesNoQuestion1();
+    question.setOptionalNextQuestion(form -> of(QuestionMocks.baseYesNoQuestion2()) );
+    return question;
+  }
+
+  public static Question<Boolean> simpleSubquestion2() {
+    Question<Boolean> question = baseYesNoQuestion3();
+    question.setOptionalNextQuestion(form -> of(QuestionMocks.baseYesNoQuestion4()) );
+    return question;
   }
 
   public static Question<Boolean> nestedSubquestions1() {

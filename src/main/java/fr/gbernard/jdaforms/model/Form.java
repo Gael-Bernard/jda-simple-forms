@@ -8,6 +8,7 @@ import lombok.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Stack;
 import java.util.function.BiConsumer;
 
 /**
@@ -26,15 +27,23 @@ public class Form {
   };
 
   /**
-   * List of questions to ask user, defined by the developer
+   * List of mandatory questions to ask user, defined by the developer
    */
-  private @NonNull List<Question<?>> questions;
+  private @NonNull List<Question<?>> mandatoryQuestions;
 
   /**
-   * Question currently waiting for an answer from the user
+   * List of questions already asked, including optional questions triggered by mandatory questions
    */
+  @Setter(AccessLevel.NONE)
   @Builder.Default
-  private @NonNull Optional<Question<?>> currentQuestion = Optional.empty();
+  private @NonNull Stack<Question<?>> questionsHistory = new Stack<>();
+
+  /**
+   * States whether the form is complete or has remaining questions to answer
+   */
+  @Setter(AccessLevel.NONE)
+  @Builder.Default
+  private boolean complete = false;
 
   /**
    * Unique ID of the user supposed to answer this question<br>
@@ -69,6 +78,24 @@ public class Form {
   private @NonNull BiConsumer<FormAnswersMap, Form> onFormComplete = DEFAULT_ON_FORM_COMPLETE;
 
   /**
+   * Current question waiting for a user answer
+   */
+  public Optional<Question<?>> getCurrentQuestion() {
+    if(isComplete()) {
+      return Optional.empty();
+    }
+
+    return Optional.of( questionsHistory.peek() );
+  }
+
+  /**
+   * Marks the form as complete
+   */
+  public void setComplete() {
+    this.complete = true;
+  }
+
+  /**
    * Finds a question by key
    * @param key key given at form creation
    * @param clazz expected type of the answer
@@ -76,7 +103,7 @@ public class Form {
    * @throws QuestionNotFoundException if no question matches key
    */
   public <T> Question<T> findQuestionByKey(String key, Class<T> clazz) throws QuestionNotFoundException {
-    return this.questions.stream()
+    return this.mandatoryQuestions.stream()
         .filter(question -> question.getKey().equals(key))
         .map(value -> (Question<T>) value)
         .findAny()
