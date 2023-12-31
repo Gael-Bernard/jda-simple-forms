@@ -4,11 +4,11 @@ import fr.gbernard.jdaforms.controller.action.EditMessage;
 import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
 import fr.gbernard.jdaforms.model.Form;
+import fr.gbernard.jdaforms.model.FormMessageEditor;
 import fr.gbernard.jdaforms.model.Question;
 import lombok.*;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.selections.EntitySelectMenu;
 
@@ -38,13 +38,15 @@ public class RoleDropdownQuestion implements Question<List<Role>> {
   private @NonNull Function<Form, Optional<Question<?>>> optionalNextQuestion = form -> Optional.empty();
 
   @Override
-  public void editQuestionMessage(InteractionHook hookToMessage, Form form) {
-    final MessageEmbed embed = EmbedTemplate.basic(title, subtitle, EmbedColor.NEUTRAL);
-    final EntitySelectMenu dropdownOptions = EntitySelectMenu
-        .create(key, EntitySelectMenu.SelectTarget.ROLE)
-        .setRequiredRange(minSelectedItems, maxSelectedItems)
-        .build();
-    EditMessage.embedAndItemComponents(hookToMessage, embed, List.of(dropdownOptions) );
+  public FormMessageEditor getMessageEditor() {
+    return (InteractionHook hookToMessage, Form form) -> {
+      final MessageEmbed embed = EmbedTemplate.basic(title, subtitle, EmbedColor.NEUTRAL);
+      final EntitySelectMenu dropdownOptions = EntitySelectMenu
+          .create(key, EntitySelectMenu.SelectTarget.ROLE)
+          .setRequiredRange(minSelectedItems, maxSelectedItems)
+          .build();
+      EditMessage.embedAndItemComponents(hookToMessage, embed, List.of(dropdownOptions) );
+    };
   }
 
   @Override

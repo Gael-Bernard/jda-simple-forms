@@ -4,6 +4,7 @@ import fr.gbernard.jdaforms.controller.action.EditMessage;
 import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
 import fr.gbernard.jdaforms.model.Form;
+import fr.gbernard.jdaforms.model.FormMessageEditor;
 import fr.gbernard.jdaforms.model.Question;
 import lombok.*;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -43,14 +44,16 @@ public class YesNoQuestion implements Question<Boolean> {
     private @NonNull Function<Form, Optional<Question<?>>> optionalNextQuestion = form -> Optional.empty();
 
     @Override
-    public void editQuestionMessage(InteractionHook hookToMessage, Form form) {
-        MessageEmbed embed = EmbedTemplate.basic(getTitle(), getSubtitle(), EmbedColor.NEUTRAL);
-        List<ItemComponent> actionRows = List.of(
-            Button.primary(YES_BUTTON_ID, getYesLabel()),
-            Button.danger(NO_BUTTON_ID, getNoLabel())
-        );
+    public FormMessageEditor getMessageEditor() {
+        return (InteractionHook hookToMessage, Form form) -> {
 
-        EditMessage.embedAndItemComponents(hookToMessage, embed, actionRows);
+            MessageEmbed embed = EmbedTemplate.basic(getTitle(), getSubtitle(), EmbedColor.NEUTRAL);
+            List<ItemComponent> actionRows = List.of(
+                Button.primary(YES_BUTTON_ID, getYesLabel()),
+                Button.danger(NO_BUTTON_ID, getNoLabel())
+            );
+            EditMessage.embedAndItemComponents(hookToMessage, embed, actionRows);
+        };
     }
 
     @Override

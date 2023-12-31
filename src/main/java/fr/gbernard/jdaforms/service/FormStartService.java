@@ -25,7 +25,7 @@ public class FormStartService {
         .reply(LOADING_MESSAGE_TEXT)
         .setEphemeral(discordForm.isEphemeral())
         .queue(sentMessage -> {
-          ExceptionUtils.uncheck(() -> question.editQuestionMessage(sentMessage, discordForm) );
+          ExceptionUtils.uncheck(() -> question.getMessageEditor().edit(sentMessage, discordForm) );
         });
   }
 
