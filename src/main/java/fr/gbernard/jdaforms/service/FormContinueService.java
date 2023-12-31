@@ -25,7 +25,7 @@ public class FormContinueService {
 
   public void sendCurrentQuestionOrEnd(Form form, InteractionHook hook) {
     if(form.getCurrentQuestion().isPresent()) {
-      ExceptionUtils.uncheck(() -> form.getCurrentQuestion().get().editQuestionMessage(hook, form) );
+      ExceptionUtils.uncheck(() -> form.getCurrentQuestion().get().getMessageEditor().edit(hook, form) );
     }
     else {
       this.triggerFormComplete(form, hook);

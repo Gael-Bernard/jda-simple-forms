@@ -2,7 +2,6 @@ package fr.gbernard.jdaforms.model;
 
 import fr.gbernard.jdaforms.utils.ExceptionUtils;
 import lombok.NonNull;
-import net.dv8tion.jda.api.interactions.InteractionHook;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,11 +38,9 @@ public interface Question<T> {
   void setOptionalNextQuestion(@NonNull Function<Form, Optional<Question<?>>> optionalNextQuestion);
 
   /**
-   * Edits the form message to display this question
-   * @param hookToMessage hook to the message to edit
-   * @param form current form
+   * Function that edits the form message to display this question<br>
    */
-  void editQuestionMessage(InteractionHook hookToMessage, Form form) throws Exception;
+  FormMessageEditor getMessageEditor();
 
   /**
    * Converts the Strings received from Discord to the right type if necessary
