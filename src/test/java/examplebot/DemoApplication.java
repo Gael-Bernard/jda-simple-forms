@@ -28,7 +28,8 @@ public class DemoApplication {
 
     jda.updateCommands().addCommands(
         Commands.slash("testoneyesno", "Triggers a single Yes/No question"),
-        Commands.slash("testyesno", "Triggers multiple Yes/No questions in a row")
+        Commands.slash("testyesno", "Triggers multiple Yes/No questions in a row"),
+        Commands.slash("alldropdowns", "Triggers a form containing all the existing dropdowns")
     ).queue();
 
     jda.awaitReady();

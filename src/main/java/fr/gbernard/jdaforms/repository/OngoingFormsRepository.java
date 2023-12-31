@@ -17,4 +17,8 @@ public class OngoingFormsRepository {
     forms.put(form.getMessageId(), form);
   }
 
+  public void delete(Form form) {
+    forms.remove(form.getMessageId());
+  }
+
 }

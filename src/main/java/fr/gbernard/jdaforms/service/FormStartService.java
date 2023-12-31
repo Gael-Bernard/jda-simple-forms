@@ -6,6 +6,8 @@ import fr.gbernard.jdaforms.repository.OngoingFormsRepository;
 import fr.gbernard.jdaforms.utils.ExceptionUtils;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
+import java.util.Optional;
+
 public class FormStartService {
 
   public final static String LOADING_MESSAGE_TEXT = "**LOADING...**";
@@ -15,7 +17,7 @@ public class FormStartService {
   public void startForm(SlashCommandInteractionEvent command, Form discordForm) {
     Question<?> question = discordForm.getQuestions().get(0);
     discordForm.setMessageId(command.getIdLong());
-    discordForm.setCurrentQuestion(question);
+    discordForm.setCurrentQuestion( Optional.of(question) );
     discordForm.setUserId(command.getUser().getIdLong());
     ongoingFormsRepository.save(discordForm);
 
