@@ -15,9 +15,9 @@ public class FormStartService {
   private final OngoingFormsRepository ongoingFormsRepository = new OngoingFormsRepository();
 
   public void startForm(SlashCommandInteractionEvent command, Form discordForm) {
-    Question<?> question = discordForm.getQuestions().get(0);
+    Question<?> question = discordForm.getMandatoryQuestions().get(0);
     discordForm.setMessageId(command.getIdLong());
-    discordForm.setCurrentQuestion( Optional.of(question) );
+    discordForm.getQuestionsHistory().push(question);
     discordForm.setUserId(command.getUser().getIdLong());
     ongoingFormsRepository.save(discordForm);
 

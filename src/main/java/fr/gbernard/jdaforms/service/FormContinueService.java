@@ -1,5 +1,6 @@
 package fr.gbernard.jdaforms.service;
 
+import fr.gbernard.jdaforms.exception.QuestionNotFoundException;
 import fr.gbernard.jdaforms.model.Form;
 import fr.gbernard.jdaforms.model.FormAnswersMap;
 import fr.gbernard.jdaforms.model.Question;
@@ -33,7 +34,7 @@ public class FormContinueService {
 
   public void triggerFormComplete(Form form, InteractionHook hook) {
 
-    final Map<String, Object> answersMap = form.getQuestions().stream()
+    final Map<String, Object> answersMap = form.getMandatoryQuestions().stream()
         .filter(question -> question.getAnswer().isPresent())
         .collect(Collectors.toMap(Question::getKey, q -> q.getAnswer().get()));
     form.getOnFormComplete().accept( new FormAnswersMap(answersMap), form);
@@ -51,7 +52,14 @@ public class FormContinueService {
   }
 
   public static void updateFormToNextQuestion(Form form) {
-    form.setCurrentQuestion( getNextQuestion(form) );
+    Optional<Question<?>> nextQuestion = getNextQuestion(form);
+
+    if(nextQuestion.isPresent()) {
+      form.getQuestionsHistory().push(nextQuestion.get());
+    }
+    else {
+      form.setComplete();
+    }
   }
 
   public static Optional<Question<?>> getNextQuestion(Form form) {
@@ -77,17 +85,33 @@ public class FormContinueService {
   }
 
   private static Optional<Question<?>> getNextQuestionInOrder(Form form) {
-    if(form.getCurrentQuestion().isEmpty()) {
+    final List<Question<?>> mandatoryQuestions = form.getMandatoryQuestions();
+    int latestMandatoryQuestionIndex = indexOflatestMandatoryQuestionInHistory(form);
+
+    if(latestMandatoryQuestionIndex == mandatoryQuestions.size()-1) {
       return Optional.empty();
     }
 
-    final List<Question<?>> questions = form.getQuestions();
-    final int currentQuestionIndex = questions.indexOf( form.getCurrentQuestion().get() );
-    if(currentQuestionIndex+1 == questions.size()) {
-      return Optional.empty();
-    }
+    return Optional.of( mandatoryQuestions.get(latestMandatoryQuestionIndex+1) );
+  }
 
-    return Optional.of( questions.get(currentQuestionIndex+1) );
+  private static int indexOflatestMandatoryQuestionInHistory(Form form) {
+    Question<?> candidateQuestion;
+    boolean isMandatoryQuestion;
+    int mandatoryIndex, historyIndex = form.getQuestionsHistory().size();
+
+    do {
+      historyIndex--;
+      candidateQuestion = form.getQuestionsHistory().get(historyIndex);
+      mandatoryIndex = form.getMandatoryQuestions().indexOf(candidateQuestion);
+      isMandatoryQuestion = mandatoryIndex != -1;
+      if(isMandatoryQuestion) {
+        return mandatoryIndex;
+      }
+    }
+    while(historyIndex > 0);
+
+    throw new QuestionNotFoundException("No question in the questions history is a mandatory question");
   }
 
 }

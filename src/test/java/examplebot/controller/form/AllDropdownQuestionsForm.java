@@ -13,7 +13,7 @@ public class AllDropdownQuestionsForm {
 
   public static Form createForm() {
     return Form.builder()
-        .questions(List.of(
+        .mandatoryQuestions(List.of(
 
             CustomDropdownQuestion.builder()
                 .key("favourite-vegetable")

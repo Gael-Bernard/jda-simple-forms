@@ -9,7 +9,7 @@ public class SingleYesNoQuestionForm {
 
   public static Form createForm() {
     return Form.builder()
-        .questions(List.of(
+        .mandatoryQuestions(List.of(
             YesNoQuestion.builder()
                 .key("single-yes-no-question")
                 .title("Please press \"SHUT UP AND TAKE MY MONEY!\" now")
