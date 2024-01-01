@@ -1,4 +1,4 @@
-package fr.gbernard.jdaforms.service;
+package fr.gbernard.jdaforms.feature;
 
 import fr.gbernard.jdaforms.model.Form;
 import fr.gbernard.jdaforms.model.Question;
@@ -6,9 +6,7 @@ import fr.gbernard.jdaforms.repository.OngoingFormsRepository;
 import fr.gbernard.jdaforms.utils.ExceptionUtils;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-import java.util.Optional;
-
-public class FormStartService {
+public class FormStartFeature {
 
   public final static String LOADING_MESSAGE_TEXT = "**LOADING...**";
 

@@ -4,6 +4,7 @@ import fr.gbernard.jdaforms.controller.action.EditMessage;
 import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
 import fr.gbernard.jdaforms.model.Form;
+import fr.gbernard.jdaforms.model.FormInteractionHandler;
 import fr.gbernard.jdaforms.model.FormMessageEditor;
 import fr.gbernard.jdaforms.model.Question;
 import lombok.*;
@@ -35,6 +36,8 @@ public class UserDropdownQuestion implements Question<List<User>> {
   @Builder.Default
   private @NonNull Optional<List<User>> answer = Optional.empty();
   @Builder.Default
+  private boolean complete = false;
+  @Builder.Default
   private @NonNull Function<Form, Optional<Question<?>>> optionalNextQuestion = form -> Optional.empty();
 
   @Override
@@ -52,8 +55,8 @@ public class UserDropdownQuestion implements Question<List<User>> {
   }
 
   @Override
-  public List<User> parseAnswer(List<String> discordReturnedValues) {
-    throw new UnsupportedOperationException("JDA entities (users, channels, etc.) are not supposed to be parsed");
+  public FormInteractionHandler getFormInteractionHandler() {
+    return (discordReturnedValues, actions) -> actions.startNextQuestionWithoutAnswering();
   }
 
 }

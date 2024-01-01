@@ -1,9 +1,7 @@
 package fr.gbernard.jdaforms.model;
 
-import fr.gbernard.jdaforms.utils.ExceptionUtils;
 import lombok.NonNull;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -32,6 +30,15 @@ public interface Question<T> {
   void setAnswer(@NonNull Optional<T> answer);
 
   /**
+   * States whether this quesiton is complete and the library can move on to the next question
+   */
+  boolean isComplete();
+  /**
+   * States whether this quesiton is complete and the library can move on to the next question
+   */
+  void setComplete(boolean isComplete);
+
+  /**
    * Provider of the current question
    */
   @NonNull Function<Form, Optional<Question<?>>> getOptionalNextQuestion();
@@ -43,19 +50,8 @@ public interface Question<T> {
   FormMessageEditor getMessageEditor();
 
   /**
-   * Converts the Strings received from Discord to the right type if necessary
-   * @param discordReturnedValues string values received from Discord
-   * @return converted value
+   * Function that saves the received answer and optionally performs other response actions
    */
-  T parseAnswer(List<String> discordReturnedValues) throws Exception;
-
-  /**
-   * Calls Question::parseAnswer and Question::setAnswer in the same method
-   * @param answer string values received from Discord
-   */
-  default void parseAndSetAnswer(List<String> answer) {
-    Optional<T> answerOpt = Optional.of( ExceptionUtils.uncheck(() -> this.parseAnswer(answer) ));
-    this.setAnswer(answerOpt);
-  }
+  FormInteractionHandler getFormInteractionHandler();
 
 }
