@@ -4,6 +4,7 @@ import fr.gbernard.jdaforms.controller.action.EditMessage;
 import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
 import fr.gbernard.jdaforms.model.Form;
+import fr.gbernard.jdaforms.model.FormInteractionHandler;
 import fr.gbernard.jdaforms.model.FormMessageEditor;
 import fr.gbernard.jdaforms.model.Question;
 import lombok.*;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 public class CustomDropdownQuestion<T extends DropdownItem> implements Question<List<T>> {
 
     private @NonNull String key;
+    private String summaryTitle;
     private @NonNull final String title;
     private final String subtitle;
 
@@ -36,12 +38,18 @@ public class CustomDropdownQuestion<T extends DropdownItem> implements Question<
     @Builder.Default
     private @NonNull Optional<List<T>> answer = Optional.empty();
     @Builder.Default
+    private boolean complete = false;
+    @Builder.Default
     private @NonNull Function<Form, Optional<Question<?>>> optionalNextQuestion = form -> Optional.empty();
 
     @NonNull
     private final List<T> choices;
     @NonNull
     private final Function<String,T> parser;
+
+    public String getSummaryTitle() {
+        return Optional.ofNullable(summaryTitle).orElse(title);
+    }
 
     @Override
     public FormMessageEditor getMessageEditor() {
@@ -64,9 +72,15 @@ public class CustomDropdownQuestion<T extends DropdownItem> implements Question<
     }
 
     @Override
-    public List<T> parseAnswer(List<String> discordReturnedValues) throws IllegalArgumentException {
-        return discordReturnedValues.stream()
-            .map(parser::apply)
-            .collect(Collectors.toList());
+    public FormInteractionHandler getFormInteractionHandler() {
+        return (discordReturnedValues, actions) -> {
+
+            List<T> parsedAnswer = discordReturnedValues.stream()
+                .map(parser)
+                .collect(Collectors.toList());
+
+            actions.answerAndStartNextQuestion(parsedAnswer);
+        };
     }
+
 }

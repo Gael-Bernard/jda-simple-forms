@@ -17,4 +17,13 @@ public class DefaultMessagesEditors {
     };
   }
 
+  public static FormMessageEditor formCancelled() {
+    return (hookToMessage, form) -> {
+
+      MessageEmbed embed = EmbedTemplate
+          .basic("❌ Cancelled", "The form and your answers were discarded.", EmbedColor.WARNING);
+      EditMessage.embed(hookToMessage, embed);
+    };
+  }
+
 }

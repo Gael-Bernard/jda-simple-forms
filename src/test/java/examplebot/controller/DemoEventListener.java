@@ -6,14 +6,14 @@ import examplebot.controller.form.YesNoQuestionsForm;
 import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
 import fr.gbernard.jdaforms.model.Form;
-import fr.gbernard.jdaforms.service.FormStartService;
+import fr.gbernard.jdaforms.feature.FormStartFeature;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 public class DemoEventListener extends ListenerAdapter {
 
-  private final FormStartService formStartService = new FormStartService();
+  private final FormStartFeature formStartFeature = new FormStartFeature();
 
   @Override
   public void onSlashCommandInteraction(SlashCommandInteractionEvent commandEvent) {
@@ -22,17 +22,17 @@ public class DemoEventListener extends ListenerAdapter {
     // This command returns Ephemeral messages (only visible by answering user)
     if(commandName.equals("testyesno")) {
       Form form = YesNoQuestionsForm.createForm();
-      formStartService.startForm(commandEvent, form);
+      formStartFeature.startForm(commandEvent, form);
     }
 
     else if(commandName.equals("testoneyesno")) {
       Form form = SingleYesNoQuestionForm.createForm();
-      formStartService.startForm(commandEvent, form);
+      formStartFeature.startForm(commandEvent, form);
     }
 
     else if(commandName.equals("alldropdowns")) {
       Form form = AllDropdownQuestionsForm.createForm();
-      formStartService.startForm(commandEvent, form);
+      formStartFeature.startForm(commandEvent, form);
     }
 
     /*

@@ -1,5 +1,6 @@
-package fr.gbernard.jdaforms.service;
+package fr.gbernard.jdaforms.feature;
 
+import fr.gbernard.jdaforms.business.FormNextQuestionBusiness;
 import fr.gbernard.jdaforms.model.Form;
 import fr.gbernard.jdaforms.model.Question;
 import mocks.service.FormMocks;
@@ -8,10 +9,11 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static java.util.Optional.of;
 import static org.junit.jupiter.api.Assertions.*;
 
-class FormContinueServiceTest_updateFormToNextQuestion {
+class FormNextQuestionBusinessTest_updateFormToNextQuestion {
+
+  final FormNextQuestionBusiness formNextQuestionBusiness = new FormNextQuestionBusiness();
 
   Form firstQuestionWithoutSubquestionsForm() {
     return FormMocks.initialised2YesNoQuestions();
@@ -47,14 +49,14 @@ class FormContinueServiceTest_updateFormToNextQuestion {
   @Test
   void noMoreQuestionSetsNoEmptyQuestion() {
     Form form = lastQuestionForm();
-    FormContinueService.updateFormToNextQuestion(form);
+    formNextQuestionBusiness.updateFormToNextQuestion(form);
     assertTrue(form.getCurrentQuestion().isEmpty());
   }
 
   @Test
   void noMoreQuestionSetsCurrentQuestionToNull() {
     Form form = lastQuestionForm();
-    FormContinueService.updateFormToNextQuestion(form);
+    formNextQuestionBusiness.updateFormToNextQuestion(form);
     assertTrue( form.getCurrentQuestion().isEmpty() );
   }
 
@@ -62,7 +64,7 @@ class FormContinueServiceTest_updateFormToNextQuestion {
   void noSubquestionSetsCurrentQuestionToNext() {
     Form form = firstQuestionWithoutSubquestionsForm();
     Question<?> question2 = form.getMandatoryQuestions().get(1);
-    FormContinueService.updateFormToNextQuestion(form);
+    formNextQuestionBusiness.updateFormToNextQuestion(form);
     assertEquals(question2, form.getCurrentQuestion().get());
   }
 
@@ -70,7 +72,7 @@ class FormContinueServiceTest_updateFormToNextQuestion {
   void subquestionSetsCurrentQuestionToSubquestion() {
     Form form = firstQuestionWithNestedSubquestionsForm();
     String subquestionKey = form.getMandatoryQuestions().get(0).getOptionalNextQuestion().apply(form).get().getKey();
-    FormContinueService.updateFormToNextQuestion(form);
+    formNextQuestionBusiness.updateFormToNextQuestion(form);
     assertEquals(subquestionKey, form.getCurrentQuestion().get().getKey());
   }
 
@@ -81,7 +83,7 @@ class FormContinueServiceTest_updateFormToNextQuestion {
     Question<?> nestedSubquestion = subquestion.getOptionalNextQuestion().apply(form).get();
     form.getQuestionsHistory().push( form.getMandatoryQuestions().get(0) );
     form.getQuestionsHistory().push( subquestion );
-    FormContinueService.updateFormToNextQuestion(form);
+    formNextQuestionBusiness.updateFormToNextQuestion(form);
     assertNotEquals(subquestion.getKey(), nestedSubquestion.getKey(), "Test may give wrong result if subquestion and nested subquestion have same key");
     assertEquals(nestedSubquestion.getKey(), form.getCurrentQuestion().get().getKey());
   }
@@ -90,7 +92,7 @@ class FormContinueServiceTest_updateFormToNextQuestion {
   void noMoreSubquestionSetsCurrentQuestionToNextMandatory() {
     Form form = atQuestion1SubquestionForm();
     Question<?> mandatoryQuestion2 = form.getMandatoryQuestions().get(1);
-    FormContinueService.updateFormToNextQuestion(form);
+    formNextQuestionBusiness.updateFormToNextQuestion(form);
     assertEquals(mandatoryQuestion2, form.getCurrentQuestion().get());
   }
 

@@ -1,12 +1,13 @@
 package fr.gbernard.jdaforms.controller;
 
+import fr.gbernard.jdaforms.business.PermissionBusiness;
+import fr.gbernard.jdaforms.business.QuestionCompletionBusiness;
 import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
+import fr.gbernard.jdaforms.feature.FormContinueFeature;
 import fr.gbernard.jdaforms.model.Form;
 import fr.gbernard.jdaforms.model.Question;
 import fr.gbernard.jdaforms.repository.OngoingFormsRepository;
-import fr.gbernard.jdaforms.service.FormContinueService;
-import fr.gbernard.jdaforms.service.PermissionService;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
@@ -22,7 +23,8 @@ import java.util.Optional;
 
 public class JdaFormsEventListener extends ListenerAdapter {
 
-  private final FormContinueService formContinueService = new FormContinueService();
+  private final QuestionCompletionBusiness questionCompletionBusiness = new QuestionCompletionBusiness();
+  private final FormContinueFeature formContinueFeature = new FormContinueFeature();
   private final OngoingFormsRepository ongoingFormsRepository = new OngoingFormsRepository();
 
   @Override
@@ -38,7 +40,7 @@ public class JdaFormsEventListener extends ListenerAdapter {
       form = formOpt.get();
     }
 
-    if(!PermissionService.userAllowedAnswer(event.getUser().getIdLong(), form)) {
+    if(!PermissionBusiness.userAllowedAnswer(event.getUser().getIdLong(), form)) {
       event.reply(MessageCreateData.fromEmbeds( EmbedTemplate.basic("\uD83D\uDEAB Permission denied", "", EmbedColor.ERROR) ))
           .setEphemeral(true)
           .queue();
@@ -47,10 +49,8 @@ public class JdaFormsEventListener extends ListenerAdapter {
 
     event.deferEdit().queue();
 
-    formContinueService.setAnswerInForm(form, answer);
-    FormContinueService.updateFormToNextQuestion(form);
-    formContinueService.sendCurrentQuestionOrEnd(form, hook);
-    formContinueService.saveOrDeleteForm(form);
+    formContinueFeature.triggerCurrentQuestionInteractionHandler(answer, hook, form);
+    formContinueFeature.saveOrDeleteForm(form);
   }
 
   public void onStringSelectInteraction(StringSelectInteractionEvent event) {
@@ -65,7 +65,7 @@ public class JdaFormsEventListener extends ListenerAdapter {
       form = formOpt.get();
     }
 
-    if(!PermissionService.userAllowedAnswer(event.getUser().getIdLong(), form)) {
+    if(!PermissionBusiness.userAllowedAnswer(event.getUser().getIdLong(), form)) {
       event.reply(MessageCreateData.fromEmbeds( EmbedTemplate.basic("\uD83D\uDEAB Permission denied", "", EmbedColor.ERROR) ))
           .setEphemeral(true)
           .queue();
@@ -74,10 +74,8 @@ public class JdaFormsEventListener extends ListenerAdapter {
 
     event.deferEdit().queue();
 
-    formContinueService.setAnswerInForm(form, answer);
-    FormContinueService.updateFormToNextQuestion(form);
-    formContinueService.sendCurrentQuestionOrEnd(form, hook);
-    formContinueService.saveOrDeleteForm(form);
+    formContinueFeature.triggerCurrentQuestionInteractionHandler(answer, hook, form);
+    formContinueFeature.saveOrDeleteForm(form);
   }
 
   @Override
@@ -92,7 +90,7 @@ public class JdaFormsEventListener extends ListenerAdapter {
       form = formOpt.get();
     }
 
-    if(!PermissionService.userAllowedAnswer(event.getUser().getIdLong(), form)) {
+    if(!PermissionBusiness.userAllowedAnswer(event.getUser().getIdLong(), form)) {
       event.reply(MessageCreateData.fromEmbeds( EmbedTemplate.basic("\uD83D\uDEAB Permission denied", "", EmbedColor.ERROR) ))
           .setEphemeral(true)
           .queue();
@@ -102,16 +100,15 @@ public class JdaFormsEventListener extends ListenerAdapter {
     final List<User> users = event.getMentions().getUsers();
     final List<GuildChannel> channels = event.getMentions().getChannels();
     final List<Role> roles = event.getMentions().getRoles();
-    final Question<?> currentQuestion = form.getCurrentQuestion().orElseThrow(IllegalStateException::new);
 
     if(!users.isEmpty()) {
-      ((Question<List<User>>) currentQuestion).setAnswer( Optional.of(users) );
+      questionCompletionBusiness.setAnswerOfCurrentQuestion(form, users);
     }
     else if(!channels.isEmpty()) {
-      ((Question<List<GuildChannel>>) currentQuestion).setAnswer( Optional.of(channels) );
+      questionCompletionBusiness.setAnswerOfCurrentQuestion(form, channels);
     }
     else if(!roles.isEmpty()) {
-      ((Question<List<Role>>) currentQuestion).setAnswer( Optional.of(roles) );
+      questionCompletionBusiness.setAnswerOfCurrentQuestion(form, roles);
     }
     else {
       throw new IllegalArgumentException("Expected a user, channel or role, while none of these is available");
@@ -119,9 +116,8 @@ public class JdaFormsEventListener extends ListenerAdapter {
 
     event.deferEdit().queue();
 
-    FormContinueService.updateFormToNextQuestion(form);
-    formContinueService.sendCurrentQuestionOrEnd(form, hook);
-    formContinueService.saveOrDeleteForm(form);
+    formContinueFeature.triggerCurrentQuestionInteractionHandler(List.of(), hook, form);
+    formContinueFeature.saveOrDeleteForm(form);
   }
 
   /*

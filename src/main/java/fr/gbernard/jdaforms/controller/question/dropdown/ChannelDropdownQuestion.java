@@ -4,6 +4,7 @@ import fr.gbernard.jdaforms.controller.action.EditMessage;
 import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
 import fr.gbernard.jdaforms.model.Form;
+import fr.gbernard.jdaforms.model.FormInteractionHandler;
 import fr.gbernard.jdaforms.model.FormMessageEditor;
 import fr.gbernard.jdaforms.model.Question;
 import lombok.*;
@@ -25,6 +26,7 @@ import java.util.function.Function;
 public class ChannelDropdownQuestion implements Question<List<GuildChannel>> {
 
   private @NonNull String key;
+  private String summaryTitle;
   private @NonNull final String title;
   private final String subtitle;
 
@@ -35,7 +37,13 @@ public class ChannelDropdownQuestion implements Question<List<GuildChannel>> {
   @Builder.Default
   private @NonNull Optional<List<GuildChannel>> answer = Optional.empty();
   @Builder.Default
+  private boolean complete = false;
+  @Builder.Default
   private @NonNull Function<Form, Optional<Question<?>>> optionalNextQuestion = form -> Optional.empty();
+
+  public String getSummaryTitle() {
+    return Optional.ofNullable(summaryTitle).orElse(title);
+  }
 
   @Override
   public FormMessageEditor getMessageEditor() {
@@ -51,8 +59,8 @@ public class ChannelDropdownQuestion implements Question<List<GuildChannel>> {
   }
 
   @Override
-  public List<GuildChannel> parseAnswer(List<String> discordReturnedValues) {
-    throw new UnsupportedOperationException("JDA entities (users, channels, etc.) are not supposed to be parsed.");
+  public FormInteractionHandler getFormInteractionHandler() {
+    return (discordReturnedValues, actions) -> actions.startNextQuestionWithoutAnswering();
   }
 
 }

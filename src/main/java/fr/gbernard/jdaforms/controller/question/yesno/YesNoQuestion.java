@@ -4,6 +4,7 @@ import fr.gbernard.jdaforms.controller.action.EditMessage;
 import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
 import fr.gbernard.jdaforms.model.Form;
+import fr.gbernard.jdaforms.model.FormInteractionHandler;
 import fr.gbernard.jdaforms.model.FormMessageEditor;
 import fr.gbernard.jdaforms.model.Question;
 import lombok.*;
@@ -30,6 +31,7 @@ public class YesNoQuestion implements Question<Boolean> {
     public static String DEFAULT_NO_LABEL = "NO";
 
     private @NonNull String key;
+    private String summaryTitle;
     private @NonNull String title;
     @Builder.Default
     private @NonNull String subtitle = "";
@@ -41,7 +43,13 @@ public class YesNoQuestion implements Question<Boolean> {
     @Builder.Default
     private @NonNull Optional<Boolean> answer = Optional.empty();
     @Builder.Default
+    private boolean complete = false;
+    @Builder.Default
     private @NonNull Function<Form, Optional<Question<?>>> optionalNextQuestion = form -> Optional.empty();
+
+    public String getSummaryTitle() {
+        return Optional.ofNullable(summaryTitle).orElse(title);
+    }
 
     @Override
     public FormMessageEditor getMessageEditor() {
@@ -57,7 +65,12 @@ public class YesNoQuestion implements Question<Boolean> {
     }
 
     @Override
-    public Boolean parseAnswer(List<String> discordReturnedValues) {
-        return discordReturnedValues.get(0).equals(YES_BUTTON_ID);
+    public FormInteractionHandler getFormInteractionHandler() {
+        return (discordReturnedValues, actions) -> {
+
+            boolean parsedAnswer = discordReturnedValues.get(0).equals(YES_BUTTON_ID);
+            actions.answerAndStartNextQuestion(parsedAnswer);
+        };
     }
+
 }
