@@ -72,7 +72,7 @@ public class Form {
    * Maps an almost-complete form into a text summary of the answers
    */
   @Builder.Default
-  private Function<Form, String> answersSummarySupplier = DefaultSummary::buildList;
+  private SummaryTextProvider answersSummarySupplier = DefaultSummary::buildList;
 
   /**
    * Edits the form message when the form is complete
