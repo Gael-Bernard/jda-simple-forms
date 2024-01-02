@@ -2,7 +2,6 @@ package fr.gbernard.jdaforms.controller.question.summary;
 
 import fr.gbernard.jdaforms.controller.action.EditMessage;
 import fr.gbernard.jdaforms.controller.defaultmessages.DefaultMessagesEditors;
-import fr.gbernard.jdaforms.controller.defaultmessages.DefaultSummary;
 import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
 import fr.gbernard.jdaforms.model.Form;
@@ -58,7 +57,7 @@ public class ValidateSummaryQuestion implements Question<Boolean> {
   @Builder.Default
   private @NonNull Function<Form, Optional<Question<?>>> optionalNextQuestion = form -> Optional.empty();
   
-  public String getSummaryTitle() {
+  public @NonNull String getSummaryTitle() {
     return Optional.ofNullable(summaryTitle).orElse(title);
   }
 
@@ -90,7 +89,7 @@ public class ValidateSummaryQuestion implements Question<Boolean> {
         ExceptionUtils.uncheck(() -> cancelDoneMessage.edit(actions.getHook(), actions.getForm()) );
       }
       else if(buttonId.equals(ALL_ANSWERS_BUTTON_ID)) {
-        final String allAnswers = DefaultSummary.buildList(actions.getForm());
+        final String allAnswers = actions.getForm().getAnswersSummarySupplier().apply(actions.getForm());
         actions.getHook().sendMessage(allAnswers)
             .setEphemeral(true)
             .queue();
