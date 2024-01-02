@@ -6,6 +6,7 @@ import fr.gbernard.jdaforms.exception.NoAnswerException;
 import fr.gbernard.jdaforms.exception.QuestionNotFoundException;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
@@ -76,6 +77,13 @@ public class Form {
    */
   @Builder.Default
   private @NonNull BiConsumer<FormAnswersMap, Form> onFormComplete = DEFAULT_ON_FORM_COMPLETE;
+
+  /**
+   * Ensures the data structure of the mandatoryQuestion field is modifiable
+   */
+  public void mapMandatoryQuestionsToModifiable() {
+    this.mandatoryQuestions = new ArrayList<>(this.mandatoryQuestions);
+  }
 
   /**
    * Current question waiting for a user answer

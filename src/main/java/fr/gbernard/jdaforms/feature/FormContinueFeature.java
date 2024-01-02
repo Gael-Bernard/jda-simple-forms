@@ -67,6 +67,11 @@ public class FormContinueFeature {
     }
   }
 
+  public void cancelForm(Form form) {
+    form.setComplete();
+    ongoingFormsRepository.delete(form);
+  }
+
   public void refreshFormWithCurrentQuestion(InteractionHook hook, Form form) {
     final Question<?> currentQuestion = form.getCurrentQuestion()
         .orElseThrow(() -> new NoCurrentQuestionException("Cannot refresh current question because there is no current question"));

@@ -26,6 +26,7 @@ import java.util.function.Function;
 public class UserDropdownQuestion implements Question<List<User>> {
 
   private @NonNull String key;
+  private String summaryTitle;
   private @NonNull final String title;
   private final String subtitle;
 
@@ -39,6 +40,10 @@ public class UserDropdownQuestion implements Question<List<User>> {
   private boolean complete = false;
   @Builder.Default
   private @NonNull Function<Form, Optional<Question<?>>> optionalNextQuestion = form -> Optional.empty();
+
+  public String getSummaryTitle() {
+    return Optional.ofNullable(summaryTitle).orElse(title);
+  }
 
   @Override
   public FormMessageEditor getMessageEditor() {

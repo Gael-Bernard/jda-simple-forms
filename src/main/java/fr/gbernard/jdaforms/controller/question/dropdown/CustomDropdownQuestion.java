@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 public class CustomDropdownQuestion<T extends DropdownItem> implements Question<List<T>> {
 
     private @NonNull String key;
+    private String summaryTitle;
     private @NonNull final String title;
     private final String subtitle;
 
@@ -45,6 +46,10 @@ public class CustomDropdownQuestion<T extends DropdownItem> implements Question<
     private final List<T> choices;
     @NonNull
     private final Function<String,T> parser;
+
+    public String getSummaryTitle() {
+        return Optional.ofNullable(summaryTitle).orElse(title);
+    }
 
     @Override
     public FormMessageEditor getMessageEditor() {

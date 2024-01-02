@@ -21,6 +21,15 @@ public interface Question<T> {
   void setKey(@NonNull String key);
 
   /**
+   * Title to display in form summary before user validates
+   */
+  @NonNull String getSummaryTitle();
+  /**
+   * Title to display in form summary before user validates
+   */
+  void setSummaryTitle(String summaryTitle);
+
+  /**
    * Parsed answer given by the user if any
    */
   @NonNull Optional<T> getAnswer();

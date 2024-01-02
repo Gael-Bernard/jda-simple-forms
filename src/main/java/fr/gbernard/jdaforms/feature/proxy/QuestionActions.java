@@ -1,10 +1,12 @@
 package fr.gbernard.jdaforms.feature.proxy;
 
 import fr.gbernard.jdaforms.business.QuestionCompletionBusiness;
+import fr.gbernard.jdaforms.controller.defaultmessages.DefaultMessagesEditors;
 import fr.gbernard.jdaforms.exception.NoAnswerException;
 import fr.gbernard.jdaforms.exception.NoCurrentQuestionException;
 import fr.gbernard.jdaforms.feature.FormContinueFeature;
 import fr.gbernard.jdaforms.model.Form;
+import fr.gbernard.jdaforms.model.FormMessageEditor;
 import fr.gbernard.jdaforms.model.Question;
 import lombok.*;
 import net.dv8tion.jda.api.interactions.InteractionHook;
@@ -49,6 +51,13 @@ public class QuestionActions {
         .orElseThrow(() -> new NoAnswerException("Cannot move to the next question before the current question has an answer"));
 
     formContinueFeature.sendNextQuestion(hook, form);
+  }
+
+  /**
+   * Discards all the data about the form, making it unusable
+   */
+  public void cancelForm() {
+    formContinueFeature.cancelForm(form);
   }
 
 }

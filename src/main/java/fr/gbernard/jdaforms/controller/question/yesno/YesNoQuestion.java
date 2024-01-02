@@ -31,6 +31,7 @@ public class YesNoQuestion implements Question<Boolean> {
     public static String DEFAULT_NO_LABEL = "NO";
 
     private @NonNull String key;
+    private String summaryTitle;
     private @NonNull String title;
     @Builder.Default
     private @NonNull String subtitle = "";
@@ -45,6 +46,10 @@ public class YesNoQuestion implements Question<Boolean> {
     private boolean complete = false;
     @Builder.Default
     private @NonNull Function<Form, Optional<Question<?>>> optionalNextQuestion = form -> Optional.empty();
+
+    public String getSummaryTitle() {
+        return Optional.ofNullable(summaryTitle).orElse(title);
+    }
 
     @Override
     public FormMessageEditor getMessageEditor() {
