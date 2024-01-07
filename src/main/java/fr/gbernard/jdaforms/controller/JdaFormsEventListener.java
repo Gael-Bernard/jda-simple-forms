@@ -10,13 +10,18 @@ import fr.gbernard.jdaforms.repository.OngoingFormsRepository;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class JdaFormsEventListener extends ListenerAdapter {
 
@@ -41,6 +46,12 @@ public class JdaFormsEventListener extends ListenerAdapter {
       return;
     }
 
+    Modal modal = formContinueFeature.getCurrentQuestionModalIfAny(form, answer).orElse(null);
+    if(modal != null) {
+      event.replyModal(modal).queue();
+      return;
+    }
+
     formContinueFeature.triggerCurrentQuestionInteractionHandler(event, answer, form);
     formContinueFeature.saveOrDeleteForm(form);
   }
@@ -58,6 +69,12 @@ public class JdaFormsEventListener extends ListenerAdapter {
       event.reply(MessageCreateData.fromEmbeds( EmbedTemplate.basic("\uD83D\uDEAB Permission denied", "", EmbedColor.ERROR) ))
           .setEphemeral(true)
           .queue();
+      return;
+    }
+
+    Modal modal = formContinueFeature.getCurrentQuestionModalIfAny(form, answer).orElse(null);
+    if(modal != null) {
+      event.replyModal(modal).queue();
       return;
     }
 
@@ -102,18 +119,28 @@ public class JdaFormsEventListener extends ListenerAdapter {
     formContinueFeature.saveOrDeleteForm(form);
   }
 
-/*
-
   @Override
   public void onModalInteraction(ModalInteractionEvent event) {
-    InteractionHook hook = event.getHook();
-    long interactionId = event.getMessage().getInteraction().getIdLong();
-    List<String> values = event.getValues().stream().map(ModalMapping::getAsString).collect(Collectors.toList());
+    final InteractionHook hook = event.getHook();
+    final long interactionId = event.getMessage().getInteraction().getIdLong();
+    final List<String> answer = event.getValues().stream().map(ModalMapping::getAsString).collect(Collectors.toList());
+
+    Form form = ongoingFormsRepository.getById(interactionId).orElse(null);
+    if(form == null) {
+      return;
+    }
+
+    if(!PermissionBusiness.userAllowedAnswer(event.getUser().getIdLong(), form)) {
+      event.reply(MessageCreateData.fromEmbeds( EmbedTemplate.basic("\uD83D\uDEAB Permission denied", "", EmbedColor.ERROR) ))
+          .setEphemeral(true)
+          .queue();
+      return;
+    }
 
     event.deferEdit().queue();
-    evaluateStringsAndNext(interactionId, hook, values);
-  }
 
-*/
+    formContinueFeature.saveAnswerAndSendNextQuestion(hook, form, answer.get(0));
+    formContinueFeature.saveOrDeleteForm(form);
+  }
 
 }

@@ -73,6 +73,11 @@ public class ValidateSummaryQuestion implements Question<Boolean> {
   }
 
   @Override
+  public FormInteractionOptionalModal getModalProviderInsteadOfHandler() {
+    return (discordReturnedValues, form) -> Optional.empty();
+  }
+
+  @Override
   public FormInteractionHandler getFormInteractionHandler() {
     return (discordReturnedValues, actions) -> {
 

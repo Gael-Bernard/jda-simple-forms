@@ -9,8 +9,10 @@ import fr.gbernard.jdaforms.model.FormAnswersMap;
 import fr.gbernard.jdaforms.model.Question;
 import fr.gbernard.jdaforms.repository.OngoingFormsRepository;
 import fr.gbernard.jdaforms.utils.ExceptionUtils;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.callbacks.IMessageEditCallback;
 import net.dv8tion.jda.api.interactions.components.ComponentInteraction;
+import net.dv8tion.jda.api.interactions.modals.Modal;
 
 import java.util.List;
 import java.util.Map;
@@ -22,6 +24,13 @@ public class FormContinueFeature {
   final FormNextQuestionBusiness formNextQuestionBusiness = new FormNextQuestionBusiness();
   final QuestionCompletionBusiness questionCompletionBusiness = new QuestionCompletionBusiness();
   final OngoingFormsRepository ongoingFormsRepository = new OngoingFormsRepository();
+
+  public Optional<Modal> getCurrentQuestionModalIfAny(Form form, List<String> discordReturnedValues) {
+    Question<?> currentQuestion = form.getCurrentQuestion()
+        .orElseThrow(() -> new NoCurrentQuestionException("Cannot trigger get current question's modal if there is no current question"));
+
+    return currentQuestion.getModalProviderInsteadOfHandler().getOptionalModal(discordReturnedValues, form);
+  }
 
   public void triggerCurrentQuestionInteractionHandler(ComponentInteraction message, List<String> answers, Form form) {
     Question<?> currentQuestion = form.getCurrentQuestion()
@@ -37,25 +46,25 @@ public class FormContinueFeature {
     currentQuestion.getFormInteractionHandler().handle(answers, actions);
   }
 
-  public <T> void saveAnswerAndSendNextQuestion(ComponentInteraction message, Form form, T answer) {
+  public <T> void saveAnswerAndSendNextQuestion(InteractionHook hookTomessage, Form form, T answer) {
     Question<T> question = (Question<T>) form.getCurrentQuestion()
         .orElseThrow((() -> new NoCurrentQuestionException("Cannot save answer if there is no current question")));
     questionCompletionBusiness.completeWithAnswer(question, answer);
-    sendNextQuestion(message, form);
+    sendNextQuestion(hookTomessage, form);
   }
 
-  public void sendNextQuestion(ComponentInteraction message, Form form) {
+  public void sendNextQuestion(InteractionHook hookTomessage, Form form) {
     formNextQuestionBusiness.updateFormToNextQuestion(form);
-    sendCurrentQuestionOrEnd(message, form);
+    sendCurrentQuestionOrEnd(hookTomessage, form);
   }
 
-  private void sendCurrentQuestionOrEnd(ComponentInteraction message, Form form) {
+  private void sendCurrentQuestionOrEnd(InteractionHook hookTomessage, Form form) {
     Optional<Question<?>> question = form.getCurrentQuestion();
     if(question.isPresent()) {
-      this.refreshFormWithQuestion(message, form, question.get());
+      this.refreshFormWithQuestion(hookTomessage, form, question.get());
     }
     else {
-      this.triggerFormComplete(form, message);
+      this.triggerFormComplete(form, hookTomessage);
     }
   }
 
@@ -77,22 +86,22 @@ public class FormContinueFeature {
     final Question<?> currentQuestion = form.getCurrentQuestion()
         .orElseThrow(() -> new NoCurrentQuestionException("Cannot refresh current question because there is no current question"));
 
-    refreshFormWithQuestion(message, form, currentQuestion);
-  }
-
-  public void refreshFormWithQuestion(IMessageEditCallback message, Form form, Question<?> question) {
     message.deferEdit().queue();
-    ExceptionUtils.uncheck(() -> question.getMessageEditor().edit(message.getHook(), form) );
+    refreshFormWithQuestion(message.getHook(), form, currentQuestion);
   }
 
-  public void triggerFormComplete(Form form, IMessageEditCallback message) {
+  public void refreshFormWithQuestion(InteractionHook hookTomessage, Form form, Question<?> question) {
+    ExceptionUtils.uncheck(() -> question.getMessageEditor().edit(hookTomessage, form) );
+  }
+
+  public void triggerFormComplete(Form form, InteractionHook hookTomessage) {
 
     final Map<String, Object> answersMap = form.getQuestionsHistory().stream()
         .filter(question -> question.getAnswer().isPresent())
         .collect(Collectors.toMap(Question::getKey, q -> q.getAnswer().get()));
     form.getOnFormComplete().accept( new FormAnswersMap(answersMap), form);
 
-    ExceptionUtils.uncheck(() -> form.getFinalMessage().edit(message, form) );
+    ExceptionUtils.uncheck(() -> form.getFinalMessage().edit(hookTomessage, form) );
   }
 
 }

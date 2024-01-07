@@ -59,6 +59,11 @@ public interface Question<T> {
   FormMessageHookEditor getMessageEditor();
 
   /**
+   * Function providing a modal to display instead of calling the regular handler
+   */
+  FormInteractionOptionalModal getModalProviderInsteadOfHandler();
+
+  /**
    * Function that saves the received answer and optionally performs other response actions
    */
   FormInteractionHandler getFormInteractionHandler();

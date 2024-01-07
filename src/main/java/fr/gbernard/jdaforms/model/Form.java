@@ -77,7 +77,7 @@ public class Form {
    * Edits the form message when the form is complete
    */
   @Builder.Default
-  private @NonNull FormMessageEditor finalMessage = DefaultMessagesEditors.formSent();
+  private @NonNull FormMessageHookEditor finalMessage = DefaultMessagesEditors.formSent();
 
   /**
    * Action to perform once the form is complete

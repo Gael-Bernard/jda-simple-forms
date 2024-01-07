@@ -36,15 +36,15 @@ public class YesNoQuestionsForm {
         .title("Do you eat healthily? :medical_symbol:")
         .build();
 
-    final FormMessageEditor finalMessage = (message, form) -> {
+    final FormMessageHookEditor finalMessage = (hookToMessage, form) -> {
 
       if( form.findAnswerByKey("healthy_food", Boolean.class) ) {
         MessageEmbed messageEmbed = EmbedTemplate.basic("Congratulations!", "You're a healthy person.", EmbedColor.SUCCESS);
-        EditMessage.embed(message, messageEmbed);
+        EditMessage.embed(hookToMessage, messageEmbed);
       }
       else {
         MessageEmbed messageEmbed = EmbedTemplate.basic("Eat more soup!", "If you're lazy to eat healthy food, you can always have pumpkin soup. I swear it's delicious!", EmbedColor.WARNING);
-        EditMessage.embed(message, messageEmbed);
+        EditMessage.embed(hookToMessage, messageEmbed);
       }
     };
 

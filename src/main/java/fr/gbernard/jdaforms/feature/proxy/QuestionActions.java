@@ -34,7 +34,8 @@ public class QuestionActions {
    * @param answer parsed answer given by user
    */
   public <T> void answerAndStartNextQuestion(T answer) {
-    formContinueFeature.saveAnswerAndSendNextQuestion(message, form, answer);
+    message.deferEdit().queue();
+    formContinueFeature.saveAnswerAndSendNextQuestion(message.getHook(), form, answer);
   }
 
   /**
@@ -48,7 +49,8 @@ public class QuestionActions {
     currentQuestion.getAnswer()
         .orElseThrow(() -> new NoAnswerException("Cannot move to the next question before the current question has an answer"));
 
-    formContinueFeature.sendNextQuestion(message, form);
+    message.deferEdit().queue();
+    formContinueFeature.sendNextQuestion(message.getHook(), form);
   }
 
   /**
