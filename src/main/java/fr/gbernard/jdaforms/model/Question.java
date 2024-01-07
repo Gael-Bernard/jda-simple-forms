@@ -51,6 +51,9 @@ public interface Question<T> {
    * Provider of the current question
    */
   @NonNull Function<Form, Optional<Question<?>>> getOptionalNextQuestion();
+  /**
+   * Provider of the current question
+   */
   void setOptionalNextQuestion(@NonNull Function<Form, Optional<Question<?>>> optionalNextQuestion);
 
   /**
