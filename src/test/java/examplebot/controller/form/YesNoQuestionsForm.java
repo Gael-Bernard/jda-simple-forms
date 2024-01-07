@@ -4,10 +4,7 @@ import fr.gbernard.jdaforms.controller.action.EditMessage;
 import fr.gbernard.jdaforms.controller.question.yesno.YesNoQuestion;
 import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
-import fr.gbernard.jdaforms.model.Form;
-import fr.gbernard.jdaforms.model.FormMessageEditor;
-import fr.gbernard.jdaforms.model.Question;
-import fr.gbernard.jdaforms.model.SummaryTextProvider;
+import fr.gbernard.jdaforms.model.*;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import java.util.List;
@@ -39,7 +36,7 @@ public class YesNoQuestionsForm {
         .title("Do you eat healthily? :medical_symbol:")
         .build();
 
-    final FormMessageEditor finalMessage = (hookToMessage, form) -> {
+    final FormMessageHookEditor finalMessage = (hookToMessage, form) -> {
 
       if( form.findAnswerByKey("healthy_food", Boolean.class) ) {
         MessageEmbed messageEmbed = EmbedTemplate.basic("Congratulations!", "You're a healthy person.", EmbedColor.SUCCESS);

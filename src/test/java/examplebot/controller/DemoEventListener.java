@@ -1,6 +1,7 @@
 package examplebot.controller;
 
 import examplebot.controller.form.AllDropdownQuestionsForm;
+import examplebot.controller.form.FreeTextfieldQuestionForm;
 import examplebot.controller.form.SingleYesNoQuestionForm;
 import examplebot.controller.form.YesNoQuestionsForm;
 import fr.gbernard.jdaforms.controller.template.EmbedColor;
@@ -30,8 +31,13 @@ public class DemoEventListener extends ListenerAdapter {
       formStartFeature.startForm(commandEvent, form);
     }
 
-    else if(commandName.equals("alldropdowns")) {
+    else if(commandName.equals("testdropdowns")) {
       Form form = AllDropdownQuestionsForm.createForm();
+      formStartFeature.startForm(commandEvent, form);
+    }
+
+    else if(commandName.equals("testfreeinput")) {
+      Form form = FreeTextfieldQuestionForm.createForm();
       formStartFeature.startForm(commandEvent, form);
     }
 

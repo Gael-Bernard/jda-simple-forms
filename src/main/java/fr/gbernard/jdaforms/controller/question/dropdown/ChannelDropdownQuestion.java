@@ -3,10 +3,7 @@ package fr.gbernard.jdaforms.controller.question.dropdown;
 import fr.gbernard.jdaforms.controller.action.EditMessage;
 import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
-import fr.gbernard.jdaforms.model.Form;
-import fr.gbernard.jdaforms.model.FormInteractionHandler;
-import fr.gbernard.jdaforms.model.FormMessageEditor;
-import fr.gbernard.jdaforms.model.Question;
+import fr.gbernard.jdaforms.model.*;
 import lombok.*;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
@@ -46,7 +43,7 @@ public class ChannelDropdownQuestion implements Question<List<GuildChannel>> {
   }
 
   @Override
-  public FormMessageEditor getMessageEditor() {
+  public FormMessageHookEditor getMessageEditor() {
     return (InteractionHook hookToMessage, Form form) -> {
 
       final MessageEmbed embed = EmbedTemplate.basic(title, subtitle, EmbedColor.NEUTRAL);
@@ -56,6 +53,11 @@ public class ChannelDropdownQuestion implements Question<List<GuildChannel>> {
           .build();
       EditMessage.embedAndItemComponents(hookToMessage, embed, List.of(dropdownOptions) );
     };
+  }
+
+  @Override
+  public FormInteractionOptionalModal getModalProviderInsteadOfHandler() {
+    return (discordReturnedValues, form) -> Optional.empty();
   }
 
   @Override

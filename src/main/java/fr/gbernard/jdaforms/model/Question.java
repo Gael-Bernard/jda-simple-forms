@@ -51,12 +51,20 @@ public interface Question<T> {
    * Provider of the current question
    */
   @NonNull Function<Form, Optional<Question<?>>> getOptionalNextQuestion();
+  /**
+   * Provider of the current question
+   */
   void setOptionalNextQuestion(@NonNull Function<Form, Optional<Question<?>>> optionalNextQuestion);
 
   /**
    * Function that edits the form message to display this question<br>
    */
-  FormMessageEditor getMessageEditor();
+  FormMessageHookEditor getMessageEditor();
+
+  /**
+   * Function providing a modal to display instead of calling the regular handler
+   */
+  FormInteractionOptionalModal getModalProviderInsteadOfHandler();
 
   /**
    * Function that saves the received answer and optionally performs other response actions

@@ -1,15 +1,13 @@
 package fr.gbernard.jdaforms.feature.proxy;
 
 import fr.gbernard.jdaforms.business.QuestionCompletionBusiness;
-import fr.gbernard.jdaforms.controller.defaultmessages.DefaultMessagesEditors;
 import fr.gbernard.jdaforms.exception.NoAnswerException;
 import fr.gbernard.jdaforms.exception.NoCurrentQuestionException;
 import fr.gbernard.jdaforms.feature.FormContinueFeature;
 import fr.gbernard.jdaforms.model.Form;
-import fr.gbernard.jdaforms.model.FormMessageEditor;
 import fr.gbernard.jdaforms.model.Question;
 import lombok.*;
-import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.interactions.components.ComponentInteraction;
 
 @Getter
 @Builder
@@ -22,13 +20,13 @@ public class QuestionActions {
   private final @NonNull QuestionCompletionBusiness questionCompletionBusiness;
 
   private final @NonNull Form form;
-  private final @NonNull InteractionHook hook;
+  private final @NonNull ComponentInteraction message;
 
   /**
    * Refreshes the form message in Discord for the user
    */
   public void refreshCurrentQuestion() {
-    formContinueFeature.refreshFormWithCurrentQuestion(hook, form);
+    formContinueFeature.refreshFormWithCurrentQuestion(message, form);
   }
 
   /**
@@ -36,7 +34,8 @@ public class QuestionActions {
    * @param answer parsed answer given by user
    */
   public <T> void answerAndStartNextQuestion(T answer) {
-    formContinueFeature.saveAnswerAndSendNextQuestion(hook, form, answer);
+    message.deferEdit().queue();
+    formContinueFeature.saveAnswerAndSendNextQuestion(message.getHook(), form, answer);
   }
 
   /**
@@ -50,7 +49,8 @@ public class QuestionActions {
     currentQuestion.getAnswer()
         .orElseThrow(() -> new NoAnswerException("Cannot move to the next question before the current question has an answer"));
 
-    formContinueFeature.sendNextQuestion(hook, form);
+    message.deferEdit().queue();
+    formContinueFeature.sendNextQuestion(message.getHook(), form);
   }
 
   /**

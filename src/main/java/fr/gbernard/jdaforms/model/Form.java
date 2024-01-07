@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 /**
  * Describes a form consisting of multiple questions
@@ -78,7 +77,7 @@ public class Form {
    * Edits the form message when the form is complete
    */
   @Builder.Default
-  private @NonNull FormMessageEditor finalMessage = DefaultMessagesEditors.formSent();
+  private @NonNull FormMessageHookEditor finalMessage = DefaultMessagesEditors.formSent();
 
   /**
    * Action to perform once the form is complete
