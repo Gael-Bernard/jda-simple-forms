@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 /**
  * Describes a form consisting of multiple questions

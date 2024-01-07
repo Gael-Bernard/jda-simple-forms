@@ -56,7 +56,7 @@ public interface Question<T> {
   /**
    * Function that edits the form message to display this question<br>
    */
-  FormMessageEditor getMessageEditor();
+  FormMessageHookEditor getMessageEditor();
 
   /**
    * Function that saves the received answer and optionally performs other response actions

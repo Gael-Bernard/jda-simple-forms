@@ -4,10 +4,7 @@ import fr.gbernard.jdaforms.controller.action.EditMessage;
 import fr.gbernard.jdaforms.controller.defaultmessages.DefaultMessagesEditors;
 import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
-import fr.gbernard.jdaforms.model.Form;
-import fr.gbernard.jdaforms.model.FormInteractionHandler;
-import fr.gbernard.jdaforms.model.FormMessageEditor;
-import fr.gbernard.jdaforms.model.Question;
+import fr.gbernard.jdaforms.model.*;
 import fr.gbernard.jdaforms.utils.ExceptionUtils;
 import lombok.*;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -62,7 +59,7 @@ public class ValidateSummaryQuestion implements Question<Boolean> {
   }
 
   @Override
-  public FormMessageEditor getMessageEditor() {
+  public FormMessageHookEditor getMessageEditor() {
     return (InteractionHook hookToMessage, Form form) -> {
 
       MessageEmbed embed = EmbedTemplate.basic(getTitle(), getSubtitle(), EmbedColor.NEUTRAL);
@@ -86,11 +83,11 @@ public class ValidateSummaryQuestion implements Question<Boolean> {
       }
       else if(buttonId.equals(CANCEL_BUTTON_ID)) {
         actions.cancelForm();
-        ExceptionUtils.uncheck(() -> cancelDoneMessage.edit(actions.getHook(), actions.getForm()) );
+        ExceptionUtils.uncheck(() -> cancelDoneMessage.edit(actions.getMessage(), actions.getForm()) );
       }
       else if(buttonId.equals(ALL_ANSWERS_BUTTON_ID)) {
         final String allAnswers = actions.getForm().getAnswersSummarySupplier().apply(actions.getForm());
-        actions.getHook().sendMessage(allAnswers)
+        actions.getMessage().reply(allAnswers)
             .setEphemeral(true)
             .queue();
       }

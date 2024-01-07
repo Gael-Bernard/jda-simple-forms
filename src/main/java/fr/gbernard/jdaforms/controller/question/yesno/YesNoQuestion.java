@@ -5,7 +5,7 @@ import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
 import fr.gbernard.jdaforms.model.Form;
 import fr.gbernard.jdaforms.model.FormInteractionHandler;
-import fr.gbernard.jdaforms.model.FormMessageEditor;
+import fr.gbernard.jdaforms.model.FormMessageHookEditor;
 import fr.gbernard.jdaforms.model.Question;
 import lombok.*;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -52,7 +52,7 @@ public class YesNoQuestion implements Question<Boolean> {
     }
 
     @Override
-    public FormMessageEditor getMessageEditor() {
+    public FormMessageHookEditor getMessageEditor() {
         return (InteractionHook hookToMessage, Form form) -> {
 
             MessageEmbed embed = EmbedTemplate.basic(getTitle(), getSubtitle(), EmbedColor.NEUTRAL);

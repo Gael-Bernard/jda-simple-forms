@@ -6,7 +6,6 @@ import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
 import fr.gbernard.jdaforms.feature.FormContinueFeature;
 import fr.gbernard.jdaforms.model.Form;
-import fr.gbernard.jdaforms.model.Question;
 import fr.gbernard.jdaforms.repository.OngoingFormsRepository;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -15,11 +14,9 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.util.List;
-import java.util.Optional;
 
 public class JdaFormsEventListener extends ListenerAdapter {
 
@@ -31,13 +28,10 @@ public class JdaFormsEventListener extends ListenerAdapter {
   public void onButtonInteraction(ButtonInteractionEvent event) {
     final long interactionId = event.getMessage().getInteraction().getIdLong();
     final List<String> answer = List.of( event.getButton().getId() );
-    final InteractionHook hook = event.getHook();
 
-    Form form;
-    {
-      Optional<Form> formOpt = ongoingFormsRepository.getById(interactionId);
-      if(formOpt.isEmpty()) { return; }
-      form = formOpt.get();
+    Form form = ongoingFormsRepository.getById(interactionId).orElse(null);
+    if(form == null) {
+      return;
     }
 
     if(!PermissionBusiness.userAllowedAnswer(event.getUser().getIdLong(), form)) {
@@ -47,22 +41,17 @@ public class JdaFormsEventListener extends ListenerAdapter {
       return;
     }
 
-    event.deferEdit().queue();
-
-    formContinueFeature.triggerCurrentQuestionInteractionHandler(answer, hook, form);
+    formContinueFeature.triggerCurrentQuestionInteractionHandler(event, answer, form);
     formContinueFeature.saveOrDeleteForm(form);
   }
 
   public void onStringSelectInteraction(StringSelectInteractionEvent event) {
     final long interactionId = event.getMessage().getInteraction().getIdLong();
     final List<String> answer = event.getValues();
-    final InteractionHook hook = event.getHook();
 
-    Form form;
-    {
-      Optional<Form> formOpt = ongoingFormsRepository.getById(interactionId);
-      if(formOpt.isEmpty()) { return; }
-      form = formOpt.get();
+    Form form = ongoingFormsRepository.getById(interactionId).orElse(null);
+    if(form == null) {
+      return;
     }
 
     if(!PermissionBusiness.userAllowedAnswer(event.getUser().getIdLong(), form)) {
@@ -72,22 +61,17 @@ public class JdaFormsEventListener extends ListenerAdapter {
       return;
     }
 
-    event.deferEdit().queue();
-
-    formContinueFeature.triggerCurrentQuestionInteractionHandler(answer, hook, form);
+    formContinueFeature.triggerCurrentQuestionInteractionHandler(event, answer, form);
     formContinueFeature.saveOrDeleteForm(form);
   }
 
   @Override
   public void onEntitySelectInteraction(EntitySelectInteractionEvent event) {
     final long interactionId = event.getMessage().getInteraction().getIdLong();
-    final InteractionHook hook = event.getHook();
 
-    Form form;
-    {
-      Optional<Form> formOpt = ongoingFormsRepository.getById(interactionId);
-      if(formOpt.isEmpty()) { return; }
-      form = formOpt.get();
+    Form form = ongoingFormsRepository.getById(interactionId).orElse(null);
+    if(form == null) {
+      return;
     }
 
     if(!PermissionBusiness.userAllowedAnswer(event.getUser().getIdLong(), form)) {
@@ -114,13 +98,11 @@ public class JdaFormsEventListener extends ListenerAdapter {
       throw new IllegalArgumentException("Expected a user, channel or role, while none of these is available");
     }
 
-    event.deferEdit().queue();
-
-    formContinueFeature.triggerCurrentQuestionInteractionHandler(List.of(), hook, form);
+    formContinueFeature.triggerCurrentQuestionInteractionHandler(event, List.of(), form);
     formContinueFeature.saveOrDeleteForm(form);
   }
 
-  /*
+/*
 
   @Override
   public void onModalInteraction(ModalInteractionEvent event) {
@@ -132,6 +114,6 @@ public class JdaFormsEventListener extends ListenerAdapter {
     evaluateStringsAndNext(interactionId, hook, values);
   }
 
-   */
+*/
 
 }
