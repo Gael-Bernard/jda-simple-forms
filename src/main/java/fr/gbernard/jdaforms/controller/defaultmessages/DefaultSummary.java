@@ -17,12 +17,12 @@ public class DefaultSummary {
         .append(System.lineSeparator());
 
     form.getQuestionsHistory().forEach(question -> {
-      Optional<?> answerOpt = question.getAnswer();
+      Optional<?> answerOpt = question.getAnswerOptional();
       builder
           .append("\uD83D\uDD18 **")
           .append(question.getSummaryTitle())
           .append("** -> ")
-          .append(answerOpt.isPresent() ? "**"+answerOpt.get()+"**" : UNDEFINED_ANSWER_PLACEHOLDER)
+          .append(answerOpt.map(o -> "**" + o + "**").orElse(UNDEFINED_ANSWER_PLACEHOLDER))
           .append(System.lineSeparator());
     });
 

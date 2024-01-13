@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 public class FormStartFeature {
 
   public final static String LOADING_MESSAGE_TEXT = "**LOADING...**";
-  public final static String SUMMARY_QUESTION_KEY = "is-summary-ok-4ohxl0vawyqy";
 
   private final OngoingFormsRepository ongoingFormsRepository = new OngoingFormsRepository();
 
@@ -20,11 +19,7 @@ public class FormStartFeature {
     discordForm.getQuestionsHistory().push(question);
     discordForm.setUserId(command.getUser().getIdLong());
     discordForm.mapMandatoryQuestionsToModifiable();
-    discordForm.getMandatoryQuestions().add(
-        ValidateSummaryQuestion.builder()
-            .key(SUMMARY_QUESTION_KEY)
-            .build()
-    );
+    discordForm.getMandatoryQuestions().add( new ValidateSummaryQuestion() );
     ongoingFormsRepository.save(discordForm);
 
     command

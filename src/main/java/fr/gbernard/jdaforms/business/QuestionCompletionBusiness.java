@@ -12,12 +12,12 @@ public class QuestionCompletionBusiness {
     final Question<T> currentQuestion = (Question<T>) form.getCurrentQuestion()
         .orElseThrow(() -> new NoCurrentQuestionException("Cannot set current question answer because there is no current question"));
 
-    currentQuestion.setAnswer( Optional.of(answer) );
+    currentQuestion.getSharedFields().setAnswer(answer);
   }
 
   public <T> void completeWithAnswer(Question<T> currentQuestion, T answer) {
-    currentQuestion.setAnswer(Optional.of(answer));
-    currentQuestion.setComplete(true);
+    currentQuestion.getSharedFields().setAnswer(answer);
+    currentQuestion.getSharedFields().setComplete(true);
   }
 
 }

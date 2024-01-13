@@ -4,52 +4,43 @@ import fr.gbernard.jdaforms.controller.action.EditMessage;
 import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
 import fr.gbernard.jdaforms.model.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.selections.EntitySelectMenu;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * Asks the user to pick one member among a list of the guild's members
  */
+@Accessors(chain = true)
 @Getter @Setter
-@Builder
-@AllArgsConstructor
 public class UserDropdownQuestion implements Question<List<User>> {
 
-  private @NonNull String key;
-  private String summaryTitle;
-  private @NonNull final String title;
-  private final String subtitle;
+  public static int DEFAULT_MIN_SELECTED = 1;
+  public static int DEFAULT_MAX_SELECTED = 1;
 
-  @Builder.Default
-  private int minSelectedItems = 1;
-  @Builder.Default
-  private int maxSelectedItems = 1;
-  @Builder.Default
-  private @NonNull Optional<List<User>> answer = Optional.empty();
-  @Builder.Default
-  private boolean complete = false;
-  @Builder.Default
-  private @NonNull Function<Form, Optional<Question<?>>> optionalNextQuestion = form -> Optional.empty();
+  private @NonNull QuestionSharedFields<List<User>> sharedFields = new QuestionSharedFields<>();
 
-  public String getSummaryTitle() {
-    return Optional.ofNullable(summaryTitle).orElse(title);
-  }
+  private @Nullable String subtitle;
+  private int minSelectedItems = DEFAULT_MIN_SELECTED;
+  private int maxSelectedItems = DEFAULT_MAX_SELECTED;
 
   @Override
-  public FormMessageHookEditor getMessageEditor() {
+  public @NotNull FormMessageHookEditor getMessageEditor() {
     return (InteractionHook hookToMessage, Form form) -> {
 
-      final MessageEmbed embed = EmbedTemplate.basic(title, subtitle, EmbedColor.NEUTRAL);
+      final MessageEmbed embed = EmbedTemplate.basic(getTitle(), subtitle, EmbedColor.NEUTRAL);
       final EntitySelectMenu dropdownOptions =
           EntitySelectMenu
-              .create(key, EntitySelectMenu.SelectTarget.USER)
+              .create(getKey(), EntitySelectMenu.SelectTarget.USER)
               .setRequiredRange(minSelectedItems, maxSelectedItems)
               .build();
       EditMessage.embedAndItemComponents(hookToMessage, embed, List.of(dropdownOptions) );
@@ -57,12 +48,7 @@ public class UserDropdownQuestion implements Question<List<User>> {
   }
 
   @Override
-  public FormInteractionOptionalModal getModalProviderInsteadOfHandler() {
-    return (discordReturnedValues, form) -> Optional.empty();
-  }
-
-  @Override
-  public FormInteractionHandler getFormInteractionHandler() {
+  public @NotNull FormInteractionHandler getFormInteractionHandler() {
     return (discordReturnedValues, actions) -> actions.startNextQuestionWithoutAnswering();
   }
 

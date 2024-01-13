@@ -46,7 +46,7 @@ public class QuestionActions {
     final Question<?> currentQuestion = form.getCurrentQuestion()
         .orElseThrow(() -> new NoCurrentQuestionException("Cannot start the next question if the form doesn't have a current question"));
 
-    currentQuestion.getAnswer()
+    currentQuestion.getAnswerOptional()
         .orElseThrow(() -> new NoAnswerException("Cannot move to the next question before the current question has an answer"));
 
     message.deferEdit().queue();

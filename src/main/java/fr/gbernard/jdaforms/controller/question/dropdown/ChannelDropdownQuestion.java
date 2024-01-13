@@ -4,51 +4,43 @@ import fr.gbernard.jdaforms.controller.action.EditMessage;
 import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
 import fr.gbernard.jdaforms.model.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.selections.EntitySelectMenu;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * Asks the user to pick one channel among a list of the guild's channels
  */
+@Accessors(chain = true)
 @Getter @Setter
-@Builder
-@AllArgsConstructor
 public class ChannelDropdownQuestion implements Question<List<GuildChannel>> {
 
-  private @NonNull String key;
-  private String summaryTitle;
-  private @NonNull final String title;
-  private final String subtitle;
+  public static int DEFAULT_MIN_SELECTED = 1;
+  public static int DEFAULT_MAX_SELECTED = 1;
 
-  @Builder.Default
-  private int minSelectedItems = 1;
-  @Builder.Default
-  private int maxSelectedItems = 1;
-  @Builder.Default
-  private @NonNull Optional<List<GuildChannel>> answer = Optional.empty();
-  @Builder.Default
-  private boolean complete = false;
-  @Builder.Default
-  private @NonNull Function<Form, Optional<Question<?>>> optionalNextQuestion = form -> Optional.empty();
+  private @NonNull QuestionSharedFields<List<GuildChannel>> sharedFields = new QuestionSharedFields<>();
 
-  public String getSummaryTitle() {
-    return Optional.ofNullable(summaryTitle).orElse(title);
-  }
+  private @Nullable String subtitle;
+  private int minSelectedItems = DEFAULT_MIN_SELECTED;
+  private int maxSelectedItems = DEFAULT_MAX_SELECTED;
 
   @Override
-  public FormMessageHookEditor getMessageEditor() {
+  public @NotNull FormMessageHookEditor getMessageEditor() {
     return (InteractionHook hookToMessage, Form form) -> {
 
-      final MessageEmbed embed = EmbedTemplate.basic(title, subtitle, EmbedColor.NEUTRAL);
+      final MessageEmbed embed = EmbedTemplate.basic(getTitle(), subtitle, EmbedColor.NEUTRAL);
       final EntitySelectMenu dropdownOptions = EntitySelectMenu
-          .create(key, EntitySelectMenu.SelectTarget.CHANNEL)
+          .create(getKey(), EntitySelectMenu.SelectTarget.CHANNEL)
           .setRequiredRange(minSelectedItems, maxSelectedItems)
           .build();
       EditMessage.embedAndItemComponents(hookToMessage, embed, List.of(dropdownOptions) );
@@ -56,10 +48,11 @@ public class ChannelDropdownQuestion implements Question<List<GuildChannel>> {
   }
 
   @Override
-  public FormInteractionOptionalModal getModalProviderInsteadOfHandler() {
+  public @NotNull FormInteractionOptionalModal getModalProviderInsteadOfHandler() {
     return (discordReturnedValues, form) -> Optional.empty();
   }
 
+  @NotNull
   @Override
   public FormInteractionHandler getFormInteractionHandler() {
     return (discordReturnedValues, actions) -> actions.startNextQuestionWithoutAnswering();

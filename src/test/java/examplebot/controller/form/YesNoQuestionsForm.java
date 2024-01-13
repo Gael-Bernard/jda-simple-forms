@@ -15,26 +15,26 @@ public class YesNoQuestionsForm {
 
   public static Form createForm() {
 
-    final Question<?> optionalQuestion = YesNoQuestion.builder()
-        .key("like-jdasf")
-        .summaryTitle("Like JDA Simple Forms?")
-        .title("Do you like the JDA Simple Forms?")
-        .subtitle("Don't worry, the dev will never know what you answered ;)")
-        .build();
+    final Question<?> optionalQuestion = new YesNoQuestion()
+        .setSubtitle("Don't worry, the dev will never know what you answered ;)");
+    optionalQuestion.getSharedFields()
+        .setKey("like-jdasf")
+        .setSummaryTitle("Like JDA Simple Forms?")
+        .setTitle("Do you like the JDA Simple Forms?");
 
-    final Question<?> question1 = YesNoQuestion.builder()
-        .key("accept-fill-form")
-        .summaryTitle("Continue?")
-        .title("Do you want to continue?")
-        .optionalNextQuestion(form -> form.findAnswerByKey("accept-fill-form", Boolean.class) ?
-            Optional.of( optionalQuestion ) : Optional.empty() )
-        .build();
+    final Question<?> question1 = new YesNoQuestion();
+    question1.getSharedFields()
+        .setKey("accept-fill-form")
+        .setSummaryTitle("Continue?")
+        .setTitle("Do you want to continue?")
+        .setOptionalNextQuestion(form -> form.findAnswerByKey("accept-fill-form", Boolean.class) ?
+            Optional.of( optionalQuestion ) : Optional.empty() );
 
-    final Question<?> question2 = YesNoQuestion.builder()
-        .key("healthy_food")
-        .summaryTitle("Eating healthy food?")
-        .title("Do you eat healthily? :medical_symbol:")
-        .build();
+    final Question<?> question2 = new YesNoQuestion();
+    question2.getSharedFields()
+        .setKey("healthy_food")
+        .setSummaryTitle("Eating healthy food?")
+        .setTitle("Do you eat healthily? :medical_symbol:");
 
     final FormMessageHookEditor finalMessage = (hookToMessage, form) -> {
 
@@ -51,7 +51,7 @@ public class YesNoQuestionsForm {
     final SummaryTextProvider summaryProvider = form ->
       "**Your great answers**: "
           +form.getQuestionsHistory().stream()
-          .map(question -> "["+question.getSummaryTitle()+" | "+question.getAnswer().orElse(null)+"]")
+          .map(question -> "["+question.getSummaryTitle()+" | "+question.getAnswerOptional().orElse(null)+"]")
           .collect(Collectors.joining());
 
     return Form.builder()

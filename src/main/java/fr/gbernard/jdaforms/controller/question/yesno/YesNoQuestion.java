@@ -4,52 +4,40 @@ import fr.gbernard.jdaforms.controller.action.EditMessage;
 import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
 import fr.gbernard.jdaforms.model.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * Yes/No question
  */
-@Builder
+@Accessors(chain = true)
 @Getter @Setter
-@AllArgsConstructor
 public class YesNoQuestion implements Question<Boolean> {
 
     public static String YES_BUTTON_ID = "yes";
     public static String NO_BUTTON_ID = "no";
+
+    public static String DEFAULT_SUBTITLE = "";
     public static String DEFAULT_YES_LABEL = "YES";
     public static String DEFAULT_NO_LABEL = "NO";
 
-    private @NonNull String key;
-    private String summaryTitle;
-    private @NonNull String title;
-    @Builder.Default
-    private @NonNull String subtitle = "";
-    @Builder.Default
-    private String yesLabel = DEFAULT_YES_LABEL;
-    @Builder.Default
-    private String noLabel = DEFAULT_NO_LABEL;
+    private @NonNull QuestionSharedFields<Boolean> sharedFields = new QuestionSharedFields<>();
 
-    @Builder.Default
-    private @NonNull Optional<Boolean> answer = Optional.empty();
-    @Builder.Default
-    private boolean complete = false;
-    @Builder.Default
-    private @NonNull Function<Form, Optional<Question<?>>> optionalNextQuestion = form -> Optional.empty();
-
-    public String getSummaryTitle() {
-        return Optional.ofNullable(summaryTitle).orElse(title);
-    }
+    private @NonNull String subtitle = DEFAULT_SUBTITLE;
+    private @NonNull String yesLabel = DEFAULT_YES_LABEL;
+    private @NonNull String noLabel = DEFAULT_NO_LABEL;
 
     @Override
-    public FormMessageHookEditor getMessageEditor() {
+    public @NotNull FormMessageHookEditor getMessageEditor() {
         return (InteractionHook hookToMessage, Form form) -> {
 
             MessageEmbed embed = EmbedTemplate.basic(getTitle(), getSubtitle(), EmbedColor.NEUTRAL);
@@ -62,12 +50,7 @@ public class YesNoQuestion implements Question<Boolean> {
     }
 
     @Override
-    public FormInteractionOptionalModal getModalProviderInsteadOfHandler() {
-        return (discordReturnedValues, form) -> Optional.empty();
-    }
-
-    @Override
-    public FormInteractionHandler getFormInteractionHandler() {
+    public @NotNull FormInteractionHandler getFormInteractionHandler() {
         return (discordReturnedValues, actions) -> {
 
             boolean parsedAnswer = discordReturnedValues.get(0).equals(YES_BUTTON_ID);
