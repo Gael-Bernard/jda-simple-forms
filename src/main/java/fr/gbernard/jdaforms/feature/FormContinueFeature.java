@@ -59,13 +59,13 @@ public class FormContinueFeature {
   }
 
   private void sendCurrentQuestionOrEnd(InteractionHook hookTomessage, Form form) {
-    Optional<Question<?>> question = form.getCurrentQuestion();
-    if(question.isPresent()) {
-      this.refreshFormWithQuestion(hookTomessage, form, question.get());
-    }
-    else {
+    if(form.isComplete()) {
       this.triggerFormComplete(form, hookTomessage);
+      return;
     }
+
+    Optional<Question<?>> question = form.getCurrentQuestion();
+    this.refreshFormWithQuestion(hookTomessage, form, question.get());
   }
 
   public void saveOrDeleteForm(Form form) {
