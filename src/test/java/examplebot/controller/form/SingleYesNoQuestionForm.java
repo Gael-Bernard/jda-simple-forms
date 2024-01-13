@@ -1,5 +1,6 @@
 package examplebot.controller.form;
 
+import fr.gbernard.jdaforms.controller.question.FormBuilder;
 import fr.gbernard.jdaforms.controller.question.yesno.YesNoBuilder;
 import fr.gbernard.jdaforms.controller.question.yesno.YesNoQuestion;
 import fr.gbernard.jdaforms.model.Form;
@@ -17,8 +18,8 @@ public class SingleYesNoQuestionForm {
         .noLabel("Not interested, sorry")
         .build();
 
-    return Form.builder()
-        .mandatoryQuestions(List.of(question))
+    return new FormBuilder()
+        .questions(List.of(question))
         .onFormComplete((answers, completeForm) -> {
           final boolean answer = answers.getAsBoolean("single-yes-no-question");
           System.out.println("User has selected button: "+answer);

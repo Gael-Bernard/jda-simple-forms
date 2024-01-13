@@ -1,6 +1,7 @@
 package examplebot.controller.form;
 
 import fr.gbernard.jdaforms.controller.action.EditMessage;
+import fr.gbernard.jdaforms.controller.question.FormBuilder;
 import fr.gbernard.jdaforms.controller.question.yesno.YesNoBuilder;
 import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
@@ -57,10 +58,10 @@ public class YesNoQuestionsForm {
           .map(question -> "["+question.getSummaryTitle()+" | "+question.getAnswerOptional().orElse(null)+"]")
           .collect(Collectors.joining());
 
-    return Form.builder()
-        .mandatoryQuestions(List.of(question1, question2))
+    return new FormBuilder()
+        .questions(List.of(question1, question2))
         .ephemeral(true)
-        .answersSummarySupplier(summaryProvider)
+        .answersSummary(summaryProvider)
         .finalMessage(finalMessage)
         .build();
   }

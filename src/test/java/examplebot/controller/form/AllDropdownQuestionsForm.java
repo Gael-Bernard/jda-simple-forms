@@ -1,6 +1,7 @@
 package examplebot.controller.form;
 
 import examplebot.controller.dropdownitem.Vegetable;
+import fr.gbernard.jdaforms.controller.question.FormBuilder;
 import fr.gbernard.jdaforms.controller.question.dropdown.*;
 import fr.gbernard.jdaforms.model.Form;
 
@@ -42,8 +43,8 @@ public class AllDropdownQuestionsForm {
         .maxSelectedItems(1)
         .build();
 
-    return Form.builder()
-        .mandatoryQuestions(List.of(customDropdown, userDropdown, channelDropdown, roleDropdown))
+    return new FormBuilder()
+        .questions(List.of(customDropdown, userDropdown, channelDropdown, roleDropdown))
         .build();
   }
 

@@ -1,5 +1,6 @@
 package examplebot.controller.form;
 
+import fr.gbernard.jdaforms.controller.question.FormBuilder;
 import fr.gbernard.jdaforms.controller.question.freetextfield.FreeTextFieldBuilder;
 import fr.gbernard.jdaforms.controller.question.freetextfield.FreeTextFieldQuestion;
 import fr.gbernard.jdaforms.model.Form;
@@ -24,8 +25,8 @@ public class FreeTextfieldQuestionForm {
         .fieldPlaceholder("Name here")
         .build();
 
-    return Form.builder()
-        .mandatoryQuestions(List.of(question1, question2))
+    return new FormBuilder()
+        .questions(List.of(question1, question2))
         .build();
   }
 
