@@ -4,50 +4,41 @@ import fr.gbernard.jdaforms.controller.action.EditMessage;
 import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
 import fr.gbernard.jdaforms.model.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.selections.EntitySelectMenu;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * Asks the user to pick one role among a list of the guild's roles
  */
+@Accessors(chain = true)
 @Getter @Setter
-@Builder
-@AllArgsConstructor
 public class RoleDropdownQuestion implements Question<List<Role>> {
 
-  private @NonNull String key;
-  private String summaryTitle;
-  private @NonNull final String title;
-  private final String subtitle;
+  public static int DEFAULT_MIN_SELECTED = 1;
+  public static int DEFAULT_MAX_SELECTED = 1;
 
-  @Builder.Default
-  private int minSelectedItems = 1;
-  @Builder.Default
-  private int maxSelectedItems = 1;
-  @Builder.Default
-  private @NonNull Optional<List<Role>> answer = Optional.empty();
-  @Builder.Default
-  private boolean complete = false;
-  @Builder.Default
-  private @NonNull Function<Form, Optional<Question<?>>> optionalNextQuestion = form -> Optional.empty();
+  private @NonNull QuestionSharedFields<List<Role>> sharedFields = new QuestionSharedFields<>();
 
-  public String getSummaryTitle() {
-    return Optional.ofNullable(summaryTitle).orElse(title);
-  }
+  private @Nullable String subtitle;
+  private int minSelectedItems = DEFAULT_MIN_SELECTED;
+  private int maxSelectedItems = DEFAULT_MAX_SELECTED;
 
   @Override
-  public FormMessageHookEditor getMessageEditor() {
+  public @NotNull FormMessageHookEditor getMessageEditor() {
     return (InteractionHook hookToMessage, Form form) -> {
-      final MessageEmbed embed = EmbedTemplate.basic(title, subtitle, EmbedColor.NEUTRAL);
+      final MessageEmbed embed = EmbedTemplate.basic(getTitle(), subtitle, EmbedColor.NEUTRAL);
       final EntitySelectMenu dropdownOptions = EntitySelectMenu
-          .create(key, EntitySelectMenu.SelectTarget.ROLE)
+          .create(getKey(), EntitySelectMenu.SelectTarget.ROLE)
           .setRequiredRange(minSelectedItems, maxSelectedItems)
           .build();
       EditMessage.embedAndItemComponents(hookToMessage, embed, List.of(dropdownOptions) );
@@ -55,12 +46,7 @@ public class RoleDropdownQuestion implements Question<List<Role>> {
   }
 
   @Override
-  public FormInteractionOptionalModal getModalProviderInsteadOfHandler() {
-    return (discordReturnedValues, form) -> Optional.empty();
-  }
-
-  @Override
-  public FormInteractionHandler getFormInteractionHandler() {
+  public @NotNull FormInteractionHandler getFormInteractionHandler() {
     return (discordReturnedValues, actions) -> actions.startNextQuestionWithoutAnswering();
   }
 

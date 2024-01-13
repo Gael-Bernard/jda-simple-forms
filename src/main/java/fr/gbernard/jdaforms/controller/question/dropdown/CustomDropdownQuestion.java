@@ -4,13 +4,17 @@ import fr.gbernard.jdaforms.controller.action.EditMessage;
 import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
 import fr.gbernard.jdaforms.model.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -18,41 +22,28 @@ import java.util.stream.Collectors;
  * Asks the user to pick one item among a list of strings
  * @param <T> expected type
  */
-@Builder
+@Accessors(chain = true)
 @Getter @Setter
-@AllArgsConstructor
 public class CustomDropdownQuestion<T extends DropdownItem> implements Question<List<T>> {
 
-    private @NonNull String key;
-    private String summaryTitle;
-    private @NonNull final String title;
-    private final String subtitle;
+    public static int DEFAULT_MIN_SELECTED = 1;
+    public static int DEFAULT_MAX_SELECTED = 1;
+    public static Function<String,?> DEFAULT_PARSER = s -> s;
 
-    @Builder.Default
-    private int minSelectedItems = 1;
-    @Builder.Default
-    private int maxSelectedItems = 1;
-    @Builder.Default
-    private @NonNull Optional<List<T>> answer = Optional.empty();
-    @Builder.Default
-    private boolean complete = false;
-    @Builder.Default
-    private @NonNull Function<Form, Optional<Question<?>>> optionalNextQuestion = form -> Optional.empty();
+    private @NonNull QuestionSharedFields<List<T>> sharedFields = new QuestionSharedFields<>();
 
-    @NonNull
-    private final List<T> choices;
-    @NonNull
-    private final Function<String,T> parser;
+    private @Nullable String subtitle;
+    private int minSelectedItems = DEFAULT_MIN_SELECTED;
+    private int maxSelectedItems = DEFAULT_MAX_SELECTED;
 
-    public String getSummaryTitle() {
-        return Optional.ofNullable(summaryTitle).orElse(title);
-    }
+    private @NonNull List<T> choices;
+    private @NonNull Function<String,T> parser = (Function<String,T>) DEFAULT_PARSER;
 
     @Override
-    public FormMessageHookEditor getMessageEditor() {
+    public @NotNull FormMessageHookEditor getMessageEditor() {
         return (InteractionHook hookToMessage, Form form) -> {
 
-            final MessageEmbed embed = EmbedTemplate.basic(title, subtitle, EmbedColor.NEUTRAL);
+            final MessageEmbed embed = EmbedTemplate.basic(getTitle(), subtitle, EmbedColor.NEUTRAL);
             final StringSelectMenu dropdownOptions = generateSelectMenu();
             EditMessage.embedAndItemComponents(hookToMessage, embed, List.of(dropdownOptions) );
         };
@@ -69,12 +60,7 @@ public class CustomDropdownQuestion<T extends DropdownItem> implements Question<
     }
 
     @Override
-    public FormInteractionOptionalModal getModalProviderInsteadOfHandler() {
-        return (discordReturnedValues, form) -> Optional.empty();
-    }
-
-    @Override
-    public FormInteractionHandler getFormInteractionHandler() {
+    public @NotNull FormInteractionHandler getFormInteractionHandler() {
         return (discordReturnedValues, actions) -> {
 
             List<T> parsedAnswer = discordReturnedValues.stream()

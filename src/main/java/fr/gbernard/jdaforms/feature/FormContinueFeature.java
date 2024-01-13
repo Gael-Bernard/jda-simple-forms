@@ -97,8 +97,7 @@ public class FormContinueFeature {
   public void triggerFormComplete(Form form, InteractionHook hookTomessage) {
 
     final Map<String, Object> answersMap = form.getQuestionsHistory().stream()
-        .filter(question -> question.getAnswer().isPresent())
-        .collect(Collectors.toMap(Question::getKey, q -> q.getAnswer().get()));
+        .collect(Collectors.toMap(Question::getKey, q -> q.getAnswerOptional().orElse(null)));
     form.getOnFormComplete().accept( new FormAnswersMap(answersMap), form);
 
     ExceptionUtils.uncheck(() -> form.getFinalMessage().edit(hookTomessage, form) );

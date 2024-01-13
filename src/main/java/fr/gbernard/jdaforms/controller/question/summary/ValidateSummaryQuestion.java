@@ -6,25 +6,27 @@ import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
 import fr.gbernard.jdaforms.model.*;
 import fr.gbernard.jdaforms.utils.ExceptionUtils;
-import lombok.*;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
 
+@Accessors(chain = true)
 @Getter @Setter
-@Builder
-@AllArgsConstructor
 public class ValidateSummaryQuestion implements Question<Boolean> {
 
   public static String SEND_BUTTON_ID = "send";
   public static String ALL_ANSWERS_BUTTON_ID = "answers";
   public static String CANCEL_BUTTON_ID = "cancel";
 
+  public static String DEFAULT_KEY = "is-summary-ok-4ohxl0vawyqy";
   public static String DEFAULT_TITLE = "Are you done?";
   public static String DEFAULT_SUBTITLE = "You can check your answers one last time before we save them."
       +"\nIf you choose to cancel the form, your answers will be deleted.";
@@ -32,34 +34,21 @@ public class ValidateSummaryQuestion implements Question<Boolean> {
   public static String DEFAULT_ALL_ANSWERS_LABEL = "Check my answers";
   public static String DEFAULT_CANCEL_LABEL = "Cancel";
 
-  private @NonNull String key;
-  private String summaryTitle;
-  @Builder.Default
-  private @NonNull String title = DEFAULT_TITLE;
-  @Builder.Default
-  private @NonNull String subtitle = DEFAULT_SUBTITLE;
-  @Builder.Default
-  private String sendLabel = DEFAULT_SEND_LABEL;
-  @Builder.Default
-  private String allAnswersLabel = DEFAULT_ALL_ANSWERS_LABEL;
-  @Builder.Default
-  private String cancelLabel = DEFAULT_CANCEL_LABEL;
-  @Builder.Default
-  private @NonNull FormMessageEditor cancelDoneMessage = DefaultMessagesEditors.formCancelled();
-
-  @Builder.Default
-  private @NonNull Optional<Boolean> answer = Optional.empty();
-  @Builder.Default
-  private boolean complete = false;
-  @Builder.Default
-  private @NonNull Function<Form, Optional<Question<?>>> optionalNextQuestion = form -> Optional.empty();
-  
-  public @NonNull String getSummaryTitle() {
-    return Optional.ofNullable(summaryTitle).orElse(title);
+  private @NonNull QuestionSharedFields<Boolean> sharedFields = new QuestionSharedFields<>();
+  {
+    sharedFields
+        .setKey(DEFAULT_KEY)
+        .setTitle(DEFAULT_TITLE);
   }
 
+  private @NonNull String subtitle = DEFAULT_SUBTITLE;
+  private @NonNull String sendLabel = DEFAULT_SEND_LABEL;
+  private @NonNull String allAnswersLabel = DEFAULT_ALL_ANSWERS_LABEL;
+  private @NonNull String cancelLabel = DEFAULT_CANCEL_LABEL;
+  private @NonNull FormMessageEditor cancelDoneMessage = DefaultMessagesEditors.formCancelled();
+
   @Override
-  public FormMessageHookEditor getMessageEditor() {
+  public @NotNull FormMessageHookEditor getMessageEditor() {
     return (InteractionHook hookToMessage, Form form) -> {
 
       MessageEmbed embed = EmbedTemplate.basic(getTitle(), getSubtitle(), EmbedColor.NEUTRAL);
@@ -73,12 +62,7 @@ public class ValidateSummaryQuestion implements Question<Boolean> {
   }
 
   @Override
-  public FormInteractionOptionalModal getModalProviderInsteadOfHandler() {
-    return (discordReturnedValues, form) -> Optional.empty();
-  }
-
-  @Override
-  public FormInteractionHandler getFormInteractionHandler() {
+  public @NotNull FormInteractionHandler getFormInteractionHandler() {
     return (discordReturnedValues, actions) -> {
 
       final String buttonId = discordReturnedValues.get(0);

@@ -134,9 +134,7 @@ public class Form {
    * @throws NoAnswerException if the question was found but doesn't have an answer yet
    */
   public <T> T findAnswerByKey(String key, Class<T> clazz) throws QuestionNotFoundException, NoAnswerException {
-    return this.findQuestionByKey(key, clazz)
-        .getAnswer()
-        .orElseThrow(() -> new NoAnswerException("Question with key "+key+" doesn't have an answer"));
+    return this.findQuestionByKey(key, clazz).getAnswer();
   }
 
 }
