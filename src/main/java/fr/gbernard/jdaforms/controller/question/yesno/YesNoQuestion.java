@@ -26,15 +26,22 @@ public class YesNoQuestion implements Question<Boolean> {
     public static String YES_BUTTON_ID = "yes";
     public static String NO_BUTTON_ID = "no";
 
-    public static String DEFAULT_SUBTITLE = "";
-    public static String DEFAULT_YES_LABEL = "YES";
-    public static String DEFAULT_NO_LABEL = "NO";
-
     private @NonNull QuestionSharedFields<Boolean> sharedFields = new QuestionSharedFields<>();
 
-    private @NonNull String subtitle = DEFAULT_SUBTITLE;
-    private @NonNull String yesLabel = DEFAULT_YES_LABEL;
-    private @NonNull String noLabel = DEFAULT_NO_LABEL;
+    /**
+     * Text to be displayed as description under the title
+     */
+    private @NonNull String subtitle;
+
+    /**
+     * Label displayed on the "YES" answer button
+     */
+    private @NonNull String yesLabel;
+
+    /**
+     * Label displayed on the "NO" answer button
+     */
+    private @NonNull String noLabel;
 
     @Override
     public @NotNull FormMessageHookEditor getMessageEditor() {
