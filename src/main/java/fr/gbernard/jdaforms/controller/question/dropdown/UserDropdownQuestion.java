@@ -24,14 +24,22 @@ import java.util.List;
 @Getter @Setter
 public class UserDropdownQuestion implements Question<List<User>> {
 
-  public static int DEFAULT_MIN_SELECTED = 1;
-  public static int DEFAULT_MAX_SELECTED = 1;
-
   private @NonNull QuestionSharedFields<List<User>> sharedFields = new QuestionSharedFields<>();
 
+  /**
+   * Text to be displayed as description under the title
+   */
   private @Nullable String subtitle;
-  private int minSelectedItems = DEFAULT_MIN_SELECTED;
-  private int maxSelectedItems = DEFAULT_MAX_SELECTED;
+
+  /**
+   * Minimum number of items user should pick from the list
+   */
+  private int minSelectedItems;
+
+  /**
+   * Maximum number of items user should pick from the list
+   */
+  private int maxSelectedItems;
 
   @Override
   public @NotNull FormMessageHookEditor getMessageEditor() {

@@ -24,26 +24,53 @@ import java.util.Optional;
 @Getter @Setter
 public class FreeTextFieldQuestion implements Question<String> {
 
-  public static String DEFAULT_SUBTITLE = "Click the button below to open the answering pop-in window.";
-  public static String DEFAULT_MODAL_BUTTON_LABEL = "Answer in pop-in";
-  public static TextInputStyle DEFAULT_TEXT_INPUT_TYPE = TextInputStyle.SHORT;
-  public static int DEFAULT_INPUT_MIN_LENGTH = 1;
-  public static int DEFAULT_INPUT_MAX_LENGTH = 128;
-
   public static String MODAL_BUTTON_ID = "modal-open-button";
   public static String MODAL_ID = "free-text-field-question-modal";
   public static String TEXT_INPUT_ID = "free-text-field";
 
   private @NonNull QuestionSharedFields<String> sharedFields = new QuestionSharedFields<>();
 
-  private @NonNull String subtitle = DEFAULT_SUBTITLE;
+  /**
+   * Text to be displayed as description under the title of the original message
+   * <br>This field is different from what will be displayed inside the pop-in modal window.
+   */
+  private @NonNull String subtitle;
+
+  /**
+   * Label of the button opening the pop-in modal window
+   */
+  private @NonNull String modalButtonLabel;
+
+  /**
+   * Title to display inside the pop-in modal window
+   */
   private @Nullable String modalTitle;
+
+  /**
+   * Label to display above the input field inside the pop-in modal window
+   */
   private @Nullable String fieldLabel;
+
+  /**
+   * Placeholder text to display inside the pop-in modal window's input field while the user hasn't typed anything
+   */
   private @Nullable String fieldPlaceholder;
-  private @NonNull TextInputStyle textInputType = DEFAULT_TEXT_INPUT_TYPE;
-  private int inputMinLength = DEFAULT_INPUT_MIN_LENGTH;
-  private int inputMaxLength = DEFAULT_INPUT_MAX_LENGTH;
-  private @NonNull String modalButtonLabel = DEFAULT_MODAL_BUTTON_LABEL;
+
+  /**
+   * Type of input field
+   * <br>This parameter mostly changes the input shape.
+   */
+  private @NonNull TextInputStyle textInputType;
+
+  /**
+   * Minimum length of user input text
+   */
+  private int inputMinLength;
+
+  /**
+   * Maximum length of user input text
+   */
+  private int inputMaxLength;
 
   public @NonNull String getModalTitle() {
     return Optional.ofNullable(modalTitle).orElse(getTitle());

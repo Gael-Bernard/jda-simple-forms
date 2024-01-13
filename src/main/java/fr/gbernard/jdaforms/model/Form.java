@@ -6,6 +6,7 @@ import fr.gbernard.jdaforms.controller.template.MessageGlobalParams;
 import fr.gbernard.jdaforms.exception.NoAnswerException;
 import fr.gbernard.jdaforms.exception.QuestionNotFoundException;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,17 +17,11 @@ import java.util.function.BiConsumer;
 /**
  * Describes a form consisting of multiple questions
  */
+@Accessors(chain = true)
 @Getter @Setter
-@Builder
-@AllArgsConstructor
 public class Form {
 
   public static long EMPTY_ID_VALUE = -1;
-
-  public static BiConsumer<FormAnswersMap, Form> DEFAULT_ON_FORM_COMPLETE = (answersMap, form) -> {
-    System.err.println("WARNING: onFormComplete was not implemented for this form. Current answers:");
-    answersMap.keys().forEach(key -> System.err.println("- "+key+": "+answersMap.getAsObject(key).toString()));
-  };
 
   /**
    * List of mandatory questions to ask user, defined by the developer
@@ -36,57 +31,48 @@ public class Form {
   /**
    * List of questions already asked, including optional questions triggered by mandatory questions
    */
-  @Setter(AccessLevel.NONE)
-  @Builder.Default
-  private @NonNull Stack<Question<?>> questionsHistory = new Stack<>();
+  private final @NonNull Stack<Question<?>> questionsHistory = new Stack<>();
 
   /**
    * States whether the form is complete or has remaining questions to answer
    */
   @Setter(AccessLevel.NONE)
-  @Builder.Default
   private boolean complete = false;
 
   /**
    * Unique ID of the user supposed to answer this question<br>
    * This value is set by the library.
    */
-  @Builder.Default
   private long userId = EMPTY_ID_VALUE;
 
   /**
    * Unique ID of the message being edited for every question<br>
    * This value is set and updated by the library.
    */
-  @Builder.Default
   private long messageId = EMPTY_ID_VALUE;
 
   /**
    * Whether the form should be invisible from the other users or not
    */
-  @Builder.Default
-  private boolean ephemeral = MessageGlobalParams.DEFAULT_IS_EPHEMERAL;
+  private boolean ephemeral;
 
   /**
    * Maps an almost-complete form into a text summary of the answers
    */
-  @Builder.Default
-  private SummaryTextProvider answersSummarySupplier = DefaultSummary::buildList;
+  private @NonNull SummaryTextProvider answersSummarySupplier;
 
   /**
    * Edits the form message when the form is complete
    */
-  @Builder.Default
-  private @NonNull FormMessageHookEditor finalMessage = DefaultMessagesEditors.formSent();
+  private @NonNull FormMessageHookEditor finalMessage;
 
   /**
    * Action to perform once the form is complete
    */
-  @Builder.Default
-  private @NonNull BiConsumer<FormAnswersMap, Form> onFormComplete = DEFAULT_ON_FORM_COMPLETE;
+  private @NonNull BiConsumer<FormAnswersMap, Form> onFormComplete;
 
   /**
-   * Ensures the data structure of the mandatoryQuestion field is modifiable
+   * Ensures the data structure of the mandatoryQuestion field is modifiable by transferring its values into an ArrayList
    */
   public void mapMandatoryQuestionsToModifiable() {
     this.mandatoryQuestions = new ArrayList<>(this.mandatoryQuestions);
