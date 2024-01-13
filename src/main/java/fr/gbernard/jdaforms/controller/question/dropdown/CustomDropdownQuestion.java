@@ -26,18 +26,36 @@ import java.util.stream.Collectors;
 @Getter @Setter
 public class CustomDropdownQuestion<T extends DropdownItem> implements Question<List<T>> {
 
-    public static int DEFAULT_MIN_SELECTED = 1;
-    public static int DEFAULT_MAX_SELECTED = 1;
-    public static Function<String,?> DEFAULT_PARSER = s -> s;
-
     private @NonNull QuestionSharedFields<List<T>> sharedFields = new QuestionSharedFields<>();
 
+    /**
+     * Text to be displayed as description under the title
+     */
     private @Nullable String subtitle;
-    private int minSelectedItems = DEFAULT_MIN_SELECTED;
-    private int maxSelectedItems = DEFAULT_MAX_SELECTED;
 
+    /**
+     * Minimum number of items user should pick from the list
+     */
+    private int minSelectedItems;
+
+    /**
+     * Maximum number of items user should pick from the list
+     */
+    private int maxSelectedItems;
+
+    /**
+     * Items of type T to propose in the dropdown
+     */
     private @NonNull List<T> choices;
-    private @NonNull Function<String,T> parser = (Function<String,T>) DEFAULT_PARSER;
+
+    /**
+     * Parser from the value of an item to an instance of the item
+     * <br>
+     * <br>For example with Vegetable{label:"DELICIOUS POTATO", value: "potato"},
+     * <br>the parser would convert as follows:
+     * <br>> "potato" -> Vegetable{label:"DELICIOUS POTATO", value: "potato"}
+     */
+    private @NonNull Function<String,T> parser;
 
     @Override
     public @NotNull FormMessageHookEditor getMessageEditor() {

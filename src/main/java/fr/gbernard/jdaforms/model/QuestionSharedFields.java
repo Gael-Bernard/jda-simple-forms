@@ -10,6 +10,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.function.Function;
 
+/**
+ * POJO containing all the fields shared between Question implementations
+ * @param <T> expected type of the question's answer
+ */
 @Accessors(chain = true)
 @Getter @Setter
 public class QuestionSharedFields<T> {
@@ -17,12 +21,12 @@ public class QuestionSharedFields<T> {
   /**
    * Unique key used to find the question and its answer in the form
    */
-  private @NonNull String key = Question.DEFAULT_KEY;
+  private @NonNull String key;
 
   /**
    * Question title, often but not necessarily displayed by questions
    */
-  private @NonNull String title = Question.DEFAULT_TITLE;
+  private @NonNull String title;
 
   /**
    * Title to display in form summary before user validates
@@ -41,14 +45,14 @@ public class QuestionSharedFields<T> {
   private boolean complete = Question.DEFAULT_IS_COMPLETE;
 
   /**
-   * Provider of the current question
+   * Provider of the following question
    */
-  private @NonNull Function<Form, Optional<Question<?>>> optionalNextQuestion = Question.DEFAULT_OPTIONAL_NEXT_QUESTION;
+  private @Nullable Function<Form, Optional<Question<?>>> optionalNextQuestion;
 
   /**
    * Function providing a modal to display instead of calling the regular form interaction handler
    */
-  private @NonNull FormInteractionOptionalModal modalProviderInsteadOfHandler = Question.DEFAULT_OPTIONAL_MODAL;
+  private @Nullable FormInteractionOptionalModal modalProviderInsteadOfHandler;
 
   /**
    * Title to display in form summary before user validates
@@ -74,6 +78,20 @@ public class QuestionSharedFields<T> {
    */
   public Optional<T> getAnswerOptional() {
     return Optional.ofNullable(answer);
+  }
+
+  /**
+   * Provider of the following question
+   */
+  public @NonNull Function<Form, Optional<Question<?>>> getOptionalNextQuestion() {
+    return Optional.ofNullable(optionalNextQuestion).orElse(Question.DEFAULT_OPTIONAL_NEXT_QUESTION);
+  }
+
+  /**
+   * Function providing a modal to display instead of calling the regular form interaction handler
+   */
+  public @NonNull FormInteractionOptionalModal getModalProviderInsteadOfHandler() {
+    return Optional.ofNullable(modalProviderInsteadOfHandler).orElse(Question.DEFAULT_OPTIONAL_MODAL);
   }
 
 }
