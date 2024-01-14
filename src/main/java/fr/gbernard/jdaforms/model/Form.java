@@ -8,12 +8,15 @@ import fr.gbernard.jdaforms.exception.NoCurrentQuestionException;
 import fr.gbernard.jdaforms.exception.QuestionNotFoundException;
 import lombok.*;
 import lombok.experimental.Accessors;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Describes a form consisting of multiple questions
@@ -73,12 +76,20 @@ public class Form {
   private @NonNull BiConsumer<FormAnswersMap, Form> onFormComplete;
 
   /**
+   * Message to send when the form is cancelled
+   */
+  private @NonNull Function<Form, MessageCreateData> timeoutMessageSupplier;
+
+  /**
    * Ensures the data structure of the mandatoryQuestion field is modifiable by transferring its values into an ArrayList
    */
   public void mapMandatoryQuestionsToModifiable() {
     this.mandatoryQuestions = new ArrayList<>(this.mandatoryQuestions);
   }
 
+  /**
+   * Current question waiting for a user answer if any
+   */
   public Question<?> getCurrentQuestion() throws NoCurrentQuestionException {
     return getCurrentQuestionOptional()
         .orElseThrow(() -> new NoCurrentQuestionException("Form "+messageId+" doesn't have a current question"));
