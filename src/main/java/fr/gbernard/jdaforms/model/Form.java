@@ -4,6 +4,7 @@ import fr.gbernard.jdaforms.controller.defaultmessages.DefaultMessagesEditors;
 import fr.gbernard.jdaforms.controller.defaultmessages.DefaultSummary;
 import fr.gbernard.jdaforms.controller.template.MessageGlobalParams;
 import fr.gbernard.jdaforms.exception.NoAnswerException;
+import fr.gbernard.jdaforms.exception.NoCurrentQuestionException;
 import fr.gbernard.jdaforms.exception.QuestionNotFoundException;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -78,10 +79,15 @@ public class Form {
     this.mandatoryQuestions = new ArrayList<>(this.mandatoryQuestions);
   }
 
+  public Question<?> getCurrentQuestion() throws NoCurrentQuestionException {
+    return getCurrentQuestionOptional()
+        .orElseThrow(() -> new NoCurrentQuestionException("Form "+messageId+" doesn't have a current question"));
+  }
+
   /**
-   * Current question waiting for a user answer
+   * Current question waiting for a user answer if any
    */
-  public Optional<Question<?>> getCurrentQuestion() {
+  public Optional<Question<?>> getCurrentQuestionOptional() {
     if(isComplete()) {
       return Optional.empty();
     }

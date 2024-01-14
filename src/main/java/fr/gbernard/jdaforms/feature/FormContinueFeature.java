@@ -2,7 +2,6 @@ package fr.gbernard.jdaforms.feature;
 
 import fr.gbernard.jdaforms.business.FormNextQuestionBusiness;
 import fr.gbernard.jdaforms.business.QuestionCompletionBusiness;
-import fr.gbernard.jdaforms.exception.NoCurrentQuestionException;
 import fr.gbernard.jdaforms.feature.proxy.QuestionActions;
 import fr.gbernard.jdaforms.model.Form;
 import fr.gbernard.jdaforms.model.FormAnswersMap;
@@ -26,15 +25,13 @@ public class FormContinueFeature {
   final OngoingFormsRepository ongoingFormsRepository = new OngoingFormsRepository();
 
   public Optional<Modal> getCurrentQuestionModalIfAny(Form form, List<String> discordReturnedValues) {
-    Question<?> currentQuestion = form.getCurrentQuestion()
-        .orElseThrow(() -> new NoCurrentQuestionException("Cannot trigger get current question's modal if there is no current question"));
+    Question<?> currentQuestion = form.getCurrentQuestion();
 
     return currentQuestion.getModalProviderInsteadOfHandler().getOptionalModal(discordReturnedValues, form);
   }
 
   public void triggerCurrentQuestionInteractionHandler(ComponentInteraction message, List<String> answers, Form form) {
-    Question<?> currentQuestion = form.getCurrentQuestion()
-        .orElseThrow(() -> new NoCurrentQuestionException("Cannot trigger FormInteractionHandler if there is no current question"));
+    Question<?> currentQuestion = form.getCurrentQuestion();
 
     QuestionActions actions = QuestionActions.builder()
         .formContinueFeature(this)
@@ -47,8 +44,7 @@ public class FormContinueFeature {
   }
 
   public <T> void saveAnswerAndSendNextQuestion(InteractionHook hookTomessage, Form form, T answer) {
-    Question<T> question = (Question<T>) form.getCurrentQuestion()
-        .orElseThrow((() -> new NoCurrentQuestionException("Cannot save answer if there is no current question")));
+    Question<T> question = (Question<T>) form.getCurrentQuestion();
     questionCompletionBusiness.completeWithAnswer(question, answer);
     sendNextQuestion(hookTomessage, form);
   }
@@ -64,16 +60,16 @@ public class FormContinueFeature {
       return;
     }
 
-    Optional<Question<?>> question = form.getCurrentQuestion();
-    this.refreshFormWithQuestion(hookTomessage, form, question.get());
+    Question<?> question = form.getCurrentQuestion();
+    this.refreshFormWithQuestion(hookTomessage, form, question);
   }
 
   public void saveOrDeleteForm(Form form) {
-    if(form.getCurrentQuestion().isPresent()) {
-      ongoingFormsRepository.save(form);
+    if(form.isComplete()) {
+      ongoingFormsRepository.delete(form);
     }
     else {
-      ongoingFormsRepository.delete(form);
+      ongoingFormsRepository.save(form);
     }
   }
 
@@ -83,9 +79,7 @@ public class FormContinueFeature {
   }
 
   public void refreshFormWithCurrentQuestion(IMessageEditCallback message, Form form) {
-    final Question<?> currentQuestion = form.getCurrentQuestion()
-        .orElseThrow(() -> new NoCurrentQuestionException("Cannot refresh current question because there is no current question"));
-
+    final Question<?> currentQuestion = form.getCurrentQuestion();
     message.deferEdit().queue();
     refreshFormWithQuestion(message.getHook(), form, currentQuestion);
   }
