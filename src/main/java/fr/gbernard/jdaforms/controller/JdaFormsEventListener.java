@@ -6,9 +6,11 @@ import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
 import fr.gbernard.jdaforms.feature.FormContinueFeature;
 import fr.gbernard.jdaforms.model.Form;
+import fr.gbernard.jdaforms.model.Question;
 import fr.gbernard.jdaforms.repository.OngoingFormsRepository;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -103,13 +105,16 @@ public class JdaFormsEventListener extends ListenerAdapter {
     final List<Role> roles = event.getMentions().getRoles();
 
     if(!users.isEmpty()) {
-      questionCompletionBusiness.setAnswerOfCurrentQuestion(form, users);
+      Question<List<User>> currentQuestion = (Question<List<User>>) form.getCurrentQuestion();
+      questionCompletionBusiness.completeWithAnswer(currentQuestion, users);
     }
     else if(!channels.isEmpty()) {
-      questionCompletionBusiness.setAnswerOfCurrentQuestion(form, channels);
+      Question<List<GuildChannel>> currentQuestion = (Question<List<GuildChannel>>) form.getCurrentQuestion();
+      questionCompletionBusiness.completeWithAnswer(currentQuestion, channels);
     }
     else if(!roles.isEmpty()) {
-      questionCompletionBusiness.setAnswerOfCurrentQuestion(form, roles);
+      Question<List<Role>> currentQuestion = (Question<List<Role>>) form.getCurrentQuestion();
+      questionCompletionBusiness.completeWithAnswer(currentQuestion, roles);
     }
     else {
       throw new IllegalArgumentException("Expected a user, channel or role, while none of these is available");

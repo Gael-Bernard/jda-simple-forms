@@ -1,16 +1,20 @@
 package fr.gbernard.jdaforms.controller.question;
 
+import fr.gbernard.jdaforms.controller.defaultmessages.DefaultMessageCreateDatas;
 import fr.gbernard.jdaforms.controller.defaultmessages.DefaultMessagesEditors;
 import fr.gbernard.jdaforms.controller.defaultmessages.DefaultSummary;
 import fr.gbernard.jdaforms.controller.template.MessageGlobalParams;
 import fr.gbernard.jdaforms.model.*;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 @Accessors(fluent = true, chain = true)
 @Getter @Setter
@@ -47,6 +51,11 @@ public class FormBuilder {
   private @NotNull BiConsumer<FormAnswersMap, Form> onFormComplete = DEFAULT_ON_FORM_COMPLETE;
 
   /**
+   * Message to send when the form is cancelled
+   */
+  private @NonNull Function<Form, MessageCreateData> timeoutMessage = DefaultMessageCreateDatas.timeoutMessage();
+
+  /**
    * Builds the Form instance
    */
   public Form build() {
@@ -55,7 +64,8 @@ public class FormBuilder {
         .setEphemeral(ephemeral)
         .setAnswersSummarySupplier(answersSummary)
         .setFinalMessage(finalMessage)
-        .setOnFormComplete(onFormComplete);
+        .setOnFormComplete(onFormComplete)
+        .setTimeoutMessageSupplier(timeoutMessage);
   }
 
 }

@@ -50,14 +50,14 @@ class FormNextQuestionBusinessTest_updateFormToNextQuestion {
   void noMoreQuestionSetsNoEmptyQuestion() {
     Form form = lastQuestionForm();
     formNextQuestionBusiness.updateFormToNextQuestion(form);
-    assertTrue(form.getCurrentQuestion().isEmpty());
+    assertTrue(form.getCurrentQuestionOptional().isEmpty());
   }
 
   @Test
   void noMoreQuestionSetsCurrentQuestionToNull() {
     Form form = lastQuestionForm();
     formNextQuestionBusiness.updateFormToNextQuestion(form);
-    assertTrue( form.getCurrentQuestion().isEmpty() );
+    assertTrue( form.getCurrentQuestionOptional().isEmpty() );
   }
 
   @Test
@@ -65,7 +65,7 @@ class FormNextQuestionBusinessTest_updateFormToNextQuestion {
     Form form = firstQuestionWithoutSubquestionsForm();
     Question<?> question2 = form.getMandatoryQuestions().get(1);
     formNextQuestionBusiness.updateFormToNextQuestion(form);
-    assertEquals(question2, form.getCurrentQuestion().get());
+    assertEquals(question2, form.getCurrentQuestion());
   }
 
   @Test
@@ -73,7 +73,7 @@ class FormNextQuestionBusinessTest_updateFormToNextQuestion {
     Form form = firstQuestionWithNestedSubquestionsForm();
     String subquestionKey = form.getMandatoryQuestions().get(0).getOptionalNextQuestion().apply(form).get().getKey();
     formNextQuestionBusiness.updateFormToNextQuestion(form);
-    assertEquals(subquestionKey, form.getCurrentQuestion().get().getKey());
+    assertEquals(subquestionKey, form.getCurrentQuestion().getKey());
   }
 
   @Test
@@ -85,7 +85,7 @@ class FormNextQuestionBusinessTest_updateFormToNextQuestion {
     form.getQuestionsHistory().push( subquestion );
     formNextQuestionBusiness.updateFormToNextQuestion(form);
     assertNotEquals(subquestion.getKey(), nestedSubquestion.getKey(), "Test may give wrong result if subquestion and nested subquestion have same key");
-    assertEquals(nestedSubquestion.getKey(), form.getCurrentQuestion().get().getKey());
+    assertEquals(nestedSubquestion.getKey(), form.getCurrentQuestion().getKey());
   }
 
   @Test
@@ -93,7 +93,7 @@ class FormNextQuestionBusinessTest_updateFormToNextQuestion {
     Form form = atQuestion1SubquestionForm();
     Question<?> mandatoryQuestion2 = form.getMandatoryQuestions().get(1);
     formNextQuestionBusiness.updateFormToNextQuestion(form);
-    assertEquals(mandatoryQuestion2, form.getCurrentQuestion().get());
+    assertEquals(mandatoryQuestion2, form.getCurrentQuestion());
   }
 
 }

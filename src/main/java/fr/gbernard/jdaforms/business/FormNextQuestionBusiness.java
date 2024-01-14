@@ -3,6 +3,7 @@ package fr.gbernard.jdaforms.business;
 import fr.gbernard.jdaforms.exception.QuestionNotFoundException;
 import fr.gbernard.jdaforms.model.Form;
 import fr.gbernard.jdaforms.model.Question;
+import fr.gbernard.jdaforms.exception.NonCompletedQuestionException;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,6 +11,10 @@ import java.util.Optional;
 public class FormNextQuestionBusiness {
 
   public void updateFormToNextQuestion(Form form) {
+    if(!form.getCurrentQuestion().isComplete()) {
+      throw new NonCompletedQuestionException("Current question needs to be complete before moving to next question");
+    }
+
     Optional<Question<?>> nextQuestion = getNextQuestion(form);
 
     if(nextQuestion.isPresent()) {
@@ -22,11 +27,9 @@ public class FormNextQuestionBusiness {
 
   public Optional<Question<?>> getNextQuestion(Form form) {
 
-    Question<?> currentQuestion;
-    {
-      Optional<Question<?>> questionOpt = form.getCurrentQuestion();
-      if(questionOpt.isEmpty()) { return Optional.empty(); }
-      currentQuestion = questionOpt.get();
+    Question<?> currentQuestion = form.getCurrentQuestionOptional().orElse(null);
+    if(currentQuestion == null) {
+      return Optional.empty();
     }
 
     final Optional<Question<?>> additionalSubquestion = currentQuestion.getOptionalNextQuestion().apply(form);

@@ -43,12 +43,6 @@ public class QuestionActions {
    * <br>This method requires the current question's answer to be defined.
    */
   public void startNextQuestionWithoutAnswering() throws NoCurrentQuestionException, NoAnswerException {
-    final Question<?> currentQuestion = form.getCurrentQuestion()
-        .orElseThrow(() -> new NoCurrentQuestionException("Cannot start the next question if the form doesn't have a current question"));
-
-    currentQuestion.getAnswerOptional()
-        .orElseThrow(() -> new NoAnswerException("Cannot move to the next question before the current question has an answer"));
-
     message.deferEdit().queue();
     formContinueFeature.sendNextQuestion(message.getHook(), form);
   }
