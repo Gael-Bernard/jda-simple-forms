@@ -5,7 +5,6 @@ import fr.gbernard.jdaforms.exception.NoAnswerException;
 import fr.gbernard.jdaforms.exception.NoCurrentQuestionException;
 import fr.gbernard.jdaforms.feature.FormContinueFeature;
 import fr.gbernard.jdaforms.model.Form;
-import fr.gbernard.jdaforms.model.Question;
 import lombok.*;
 import net.dv8tion.jda.api.interactions.components.ComponentInteraction;
 
@@ -35,7 +34,7 @@ public class QuestionActions {
    */
   public <T> void answerAndStartNextQuestion(T answer) {
     message.deferEdit().queue();
-    formContinueFeature.saveAnswerAndSendNextQuestion(message.getHook(), form, answer);
+    formContinueFeature.validateAnswerAndSendNextQuestion(message.getHook(), form, answer);
   }
 
   /**

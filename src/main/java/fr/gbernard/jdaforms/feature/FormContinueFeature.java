@@ -43,8 +43,12 @@ public class FormContinueFeature {
     currentQuestion.getFormInteractionHandler().handle(answers, actions);
   }
 
-  public <T> void saveAnswerAndSendNextQuestion(InteractionHook hookTomessage, Form form, T answer) {
+  public <T> void validateAnswerAndSendNextQuestion(InteractionHook hookTomessage, Form form, T answer) {
     Question<T> question = (Question<T>) form.getCurrentQuestion();
+    if(!questionCompletionBusiness.isAnswerValid(question, answer, form)) {
+      refreshFormWithQuestion(hookTomessage, form, question);
+      return;
+    }
     questionCompletionBusiness.completeWithAnswer(question, answer);
     sendNextQuestion(hookTomessage, form);
   }

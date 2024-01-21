@@ -1,15 +1,20 @@
 package fr.gbernard.jdaforms.controller.question.dropdown;
 
+import fr.gbernard.jdaforms.controller.defaultmessages.DefaultMessageCreateDatas;
 import fr.gbernard.jdaforms.model.Form;
 import fr.gbernard.jdaforms.model.Question;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 /**
@@ -18,6 +23,11 @@ import java.util.function.Function;
 @Accessors(chain = true, fluent = true)
 @Getter @Setter
 public class CustomDropdownBuilder<T extends DropdownItem> {
+
+  @Getter(AccessLevel.NONE) @Setter(AccessLevel.NONE)
+  public BiPredicate<List<T>, Form> DEFAULT_INPUT_VALIDATOR = (s, form) -> true;
+  @Getter(AccessLevel.NONE) @Setter(AccessLevel.NONE)
+  public Function<List<T>, MessageCreateData> DEFAULT_VALIDATION_MESSAGE = DefaultMessageCreateDatas.objectValidationError();
 
   public static int DEFAULT_MIN_SELECTED = 1;
   public static int DEFAULT_MAX_SELECTED = 1;
@@ -42,6 +52,18 @@ public class CustomDropdownBuilder<T extends DropdownItem> {
    * <br>Defaults to value of title field if not defined
    */
   private @Nullable String summaryTitle;
+
+  /**
+   * User input validator
+   * <br>If the input string is invalid (returning false), the question is asked again.
+   * <br>The validator can throw RuntimeException safely, interpreted as invalid input.
+   */
+  private @NonNull BiPredicate<List<T>, Form> inputValidator = DEFAULT_INPUT_VALIDATOR;
+
+  /**
+   * Message the user receives after inputting an invalid value
+   */
+  private @NonNull Function<List<T>, MessageCreateData> invalidInputMessage = DEFAULT_VALIDATION_MESSAGE;
 
   /**
    * Provider of the current question
@@ -94,6 +116,8 @@ public class CustomDropdownBuilder<T extends DropdownItem> {
         .setKey(key)
         .setTitle(title)
         .setSummaryTitle(summaryTitle)
+        .setInputValidator(inputValidator)
+        .setInvalidInputMessage(invalidInputMessage)
         .setOptionalNextQuestion(optionalNextQuestion);
     question
         .setSubtitle(subtitle)

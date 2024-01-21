@@ -2,8 +2,10 @@ package fr.gbernard.jdaforms.model;
 
 import fr.gbernard.jdaforms.exception.NoAnswerException;
 import lombok.NonNull;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.util.Optional;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 /**
@@ -69,6 +71,22 @@ public interface Question<T> {
    */
   default Optional<T> getAnswerOptional() {
     return this.getSharedFields().getAnswerOptional();
+  }
+
+  /**
+   * User input validator
+   * <br>If the input string is invalid (returning false), the question is asked again.
+   * <br>The validator can throw RuntimeException safely, interpreted as invalid input.
+   */
+  default @NonNull BiPredicate<T, Form> getInputValidator() {
+    return this.getSharedFields().getInputValidator();
+  }
+
+  /**
+   * Message the user receives after inputting an invalid value
+   */
+  default @NonNull Function<T, MessageCreateData> getInvalidInputMessage() {
+    return this.getSharedFields().getInvalidInputMessage();
   }
 
   /**

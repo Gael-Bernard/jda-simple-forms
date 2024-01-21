@@ -14,7 +14,8 @@ public class FreeTextfieldQuestionForm {
     final FreeTextFieldQuestion question1 = new FreeTextFieldBuilder()
         .key("name")
         .modalTitle("What's your name?")
-        .fieldLabel("Your name")
+        .fieldLabel("Your name (cannot start with T)")
+        .inputValidator(((value, form) -> !value.toUpperCase().startsWith("T")))
         .build();
 
     final FreeTextFieldQuestion question2 = new FreeTextFieldBuilder()

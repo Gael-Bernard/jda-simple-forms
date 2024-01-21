@@ -1,5 +1,6 @@
 package fr.gbernard.jdaforms.controller.question.freetextfield;
 
+import fr.gbernard.jdaforms.controller.action.EditMessage;
 import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
 import fr.gbernard.jdaforms.model.*;
@@ -13,7 +14,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
-import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -89,11 +89,9 @@ public class FreeTextFieldQuestion implements Question<String> {
 
       MessageEmbed embed = EmbedTemplate.basic(getTitle(), subtitle, EmbedColor.NEUTRAL);
 
-      hookToMessage
-          .editOriginal(MessageEditData.fromEmbeds(embed))
-          .setActionRow(
-              Button.primary(MODAL_BUTTON_ID, modalButtonLabel)
-          ).queue();
+      EditMessage.embedAndItemComponents(hookToMessage, embed, List.of(
+          Button.primary(MODAL_BUTTON_ID, modalButtonLabel)
+      ));
 
     };
   }

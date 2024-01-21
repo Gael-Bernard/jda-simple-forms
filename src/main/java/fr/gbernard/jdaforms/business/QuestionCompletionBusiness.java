@@ -15,4 +15,12 @@ public class QuestionCompletionBusiness {
     currentQuestion.getSharedFields().setComplete(true);
   }
 
+  public <T> boolean isAnswerValid(Question<T> question, T answer, Form form) {
+
+    try {
+      return question.getInputValidator().test(answer, form);
+    } catch (Exception e) {
+      return false;
+    }
+  }
 }
