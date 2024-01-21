@@ -5,9 +5,11 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 /**
@@ -38,6 +40,18 @@ public class QuestionSharedFields<T> {
    * Parsed answer given by the user if any
    */
   private @Nullable T answer;
+
+  /**
+   * User input validator
+   * <br>If the input string is invalid (returning false), the question is asked again.
+   * <br>The validator can throw RuntimeException safely, interpreted as invalid input.
+   */
+  private @NonNull BiPredicate<T, Form> inputValidator;
+
+  /**
+   * Message the user receives after inputting an invalid value
+   */
+  private @NonNull Function<T, MessageCreateData> invalidInputMessage;
 
   /**
    * States whether this question is complete and the library can move on to the next question

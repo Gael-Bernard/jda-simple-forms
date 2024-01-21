@@ -1,6 +1,7 @@
 package fr.gbernard.jdaforms.controller.question.summary;
 
 import fr.gbernard.jdaforms.controller.action.EditMessage;
+import fr.gbernard.jdaforms.controller.defaultmessages.DefaultMessageCreateDatas;
 import fr.gbernard.jdaforms.controller.defaultmessages.DefaultMessagesEditors;
 import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
@@ -14,13 +15,19 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.function.BiPredicate;
+import java.util.function.Function;
 
 @Accessors(chain = true)
 @Getter @Setter
 public class ValidateSummaryQuestion implements Question<Boolean> {
+
+  public static BiPredicate<Boolean, Form> INPUT_VALIDATOR = (s, form) -> true;
+  public static Function<Boolean, MessageCreateData> VALIDATION_ERROR_MESSAGE = DefaultMessageCreateDatas.objectValidationError();
 
   public static String SEND_BUTTON_ID = "send";
   public static String ALL_ANSWERS_BUTTON_ID = "answers";
@@ -38,7 +45,9 @@ public class ValidateSummaryQuestion implements Question<Boolean> {
   {
     sharedFields
         .setKey(DEFAULT_KEY)
-        .setTitle(DEFAULT_TITLE);
+        .setTitle(DEFAULT_TITLE)
+        .setInputValidator(INPUT_VALIDATOR)
+        .setInvalidInputMessage(VALIDATION_ERROR_MESSAGE);
   }
 
   private @NonNull String subtitle = DEFAULT_SUBTITLE;

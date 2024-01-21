@@ -1,14 +1,17 @@
 package fr.gbernard.jdaforms.controller.question.yesno;
 
+import fr.gbernard.jdaforms.controller.defaultmessages.DefaultMessageCreateDatas;
 import fr.gbernard.jdaforms.model.Form;
 import fr.gbernard.jdaforms.model.Question;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 /**
@@ -18,6 +21,8 @@ import java.util.function.Function;
 @Getter @Setter
 public class YesNoBuilder {
 
+  public static BiPredicate<Boolean, Form> INPUT_VALIDATOR = (s, form) -> true;
+  public static Function<Boolean, MessageCreateData> VALIDATION_ERROR_MESSAGE = DefaultMessageCreateDatas.objectValidationError();
   public static String DEFAULT_SUBTITLE = "";
   public static String DEFAULT_YES_LABEL = "YES";
   public static String DEFAULT_NO_LABEL = "NO";
@@ -79,6 +84,8 @@ public class YesNoBuilder {
         .setKey(key)
         .setTitle(title)
         .setSummaryTitle(summaryTitle)
+        .setInputValidator(INPUT_VALIDATOR)
+        .setInvalidInputMessage(VALIDATION_ERROR_MESSAGE)
         .setOptionalNextQuestion(optionalNextQuestion);
     question
         .setSubtitle(subtitle)

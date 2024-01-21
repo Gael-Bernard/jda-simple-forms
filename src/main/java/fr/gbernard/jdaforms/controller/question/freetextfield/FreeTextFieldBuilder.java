@@ -1,15 +1,19 @@
 package fr.gbernard.jdaforms.controller.question.freetextfield;
 
+import fr.gbernard.jdaforms.controller.defaultmessages.DefaultMessageCreateDatas;
 import fr.gbernard.jdaforms.model.Form;
 import fr.gbernard.jdaforms.model.Question;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 /**
@@ -19,11 +23,15 @@ import java.util.function.Function;
 @Getter @Setter
 public class FreeTextFieldBuilder {
 
+  public static BiPredicate<String, Form> DEFAULT_INPUT_VALIDATOR = (s, form) -> true;
+  public static Function<String, MessageCreateData> DEFAULT_VALIDATION_MESSAGE = DefaultMessageCreateDatas.objectValidationError();
+
   public static String DEFAULT_SUBTITLE = "Click the button below to open the answering pop-in window.";
   public static String DEFAULT_MODAL_BUTTON_LABEL = "Answer in pop-in";
   public static TextInputStyle DEFAULT_TEXT_INPUT_TYPE = TextInputStyle.SHORT;
   public static int DEFAULT_INPUT_MIN_LENGTH = 1;
   public static int DEFAULT_INPUT_MAX_LENGTH = 128;
+  public static BiPredicate<String, Form> DEFAULT_VALIDATOR = (value, form) -> true;
 
   /* -----------------------------------------
     Shared between questions
@@ -44,6 +52,18 @@ public class FreeTextFieldBuilder {
    * <br>Defaults to value of title field if not defined
    */
   private @Nullable String summaryTitle;
+
+  /**
+   * User input validator
+   * <br>If the input string is invalid (returning false), the question is asked again.
+   * <br>The validator can throw RuntimeException safely, interpreted as invalid input.
+   */
+  private @NonNull BiPredicate<String, Form> inputValidator = DEFAULT_INPUT_VALIDATOR;
+
+  /**
+   * Message the user receives after inputting an invalid value
+   */
+  private @NonNull Function<String, MessageCreateData> invalidInputMessage = DEFAULT_VALIDATION_MESSAGE;
 
   /**
    * Provider of the current question
@@ -109,6 +129,8 @@ public class FreeTextFieldBuilder {
         .setKey(key)
         .setTitle(title)
         .setSummaryTitle(summaryTitle)
+        .setInputValidator(inputValidator)
+        .setInvalidInputMessage(invalidInputMessage)
         .setOptionalNextQuestion(optionalNextQuestion);
     question
         .setSubtitle(subtitle)

@@ -10,7 +10,6 @@ import fr.gbernard.jdaforms.model.Question;
 import fr.gbernard.jdaforms.repository.OngoingFormsRepository;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -144,7 +143,7 @@ public class JdaFormsEventListener extends ListenerAdapter {
 
     event.deferEdit().queue();
 
-    formContinueFeature.saveAnswerAndSendNextQuestion(hook, form, answer.get(0));
+    formContinueFeature.validateAnswerAndSendNextQuestion(hook, form, answer.get(0));
     formContinueFeature.saveOrDeleteForm(form);
   }
 
