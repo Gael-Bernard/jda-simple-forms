@@ -10,6 +10,7 @@ import fr.gbernard.jdaforms.model.Form;
 import fr.gbernard.jdaforms.model.FormMessageHookEditor;
 import fr.gbernard.jdaforms.model.Question;
 import fr.gbernard.jdaforms.model.SummaryTextProvider;
+import fr.gbernard.jdaforms.utils.ExceptionUtils;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import java.util.List;
@@ -65,7 +66,9 @@ public class YesNoQuestionsForm {
     return new FormBuilder()
         .questions(List.of(question1, question2, validateQuestion))
         .ephemeral(true)
-        .finalMessage(finalMessage)
+        .onFormComplete((hookToMessage, answersMap, form) ->
+            ExceptionUtils.uncheck(() -> finalMessage.edit(hookToMessage, form))
+        )
         .build();
   }
 }

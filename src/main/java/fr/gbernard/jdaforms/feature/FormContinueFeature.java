@@ -96,9 +96,7 @@ public class FormContinueFeature {
 
     final Map<String, Object> answersMap = form.getQuestionsHistory().stream()
         .collect(Collectors.toMap(Question::getKey, q -> q.getAnswerOptional().orElse(null)));
-    form.getOnFormComplete().accept( new FormAnswersMap(answersMap), form);
-
-    ExceptionUtils.uncheck(() -> form.getFinalMessage().edit(hookTomessage, form) );
+    form.getOnFormComplete().handleLastInteraction(hookTomessage, new FormAnswersMap(answersMap), form);
   }
 
 }

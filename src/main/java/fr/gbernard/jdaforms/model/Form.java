@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 /**
@@ -60,14 +59,9 @@ public class Form {
   private boolean ephemeral;
 
   /**
-   * Edits the form message when the form is complete
-   */
-  private @NonNull FormMessageHookEditor finalMessage;
-
-  /**
    * Action to perform once the form is complete
    */
-  private @NonNull BiConsumer<FormAnswersMap, Form> onFormComplete;
+  private @NonNull FormLastInteractionHandler onFormComplete;
 
   /**
    * Message to send when the form is cancelled
