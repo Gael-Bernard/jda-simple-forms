@@ -3,6 +3,7 @@ package fr.gbernard.jdaforms.controller.question.summary;
 import fr.gbernard.jdaforms.controller.action.EditMessage;
 import fr.gbernard.jdaforms.controller.defaultmessages.DefaultMessageCreateDatas;
 import fr.gbernard.jdaforms.controller.defaultmessages.DefaultMessagesEditors;
+import fr.gbernard.jdaforms.controller.defaultmessages.DefaultSummary;
 import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
 import fr.gbernard.jdaforms.model.*;
@@ -56,6 +57,18 @@ public class ValidateSummaryQuestion implements Question<Boolean> {
   private @NonNull String cancelLabel = DEFAULT_CANCEL_LABEL;
   private @NonNull FormMessageEditor cancelDoneMessage = DefaultMessagesEditors.formCancelled();
 
+  /**
+   * Maps an almost-complete form into a text summary of the answers
+   */
+  private @NotNull SummaryTextProvider answersSummary = DefaultSummary::buildList;
+
+
+  public ValidateSummaryQuestion() { }
+
+  public ValidateSummaryQuestion(SummaryTextProvider answersSummary) {
+    this.answersSummary = answersSummary;
+  }
+
   @Override
   public @NotNull FormMessageHookEditor getMessageEditor() {
     return (InteractionHook hookToMessage, Form form) -> {
@@ -84,7 +97,7 @@ public class ValidateSummaryQuestion implements Question<Boolean> {
         ExceptionUtils.uncheck(() -> cancelDoneMessage.edit(actions.getMessage(), actions.getForm()) );
       }
       else if(buttonId.equals(ALL_ANSWERS_BUTTON_ID)) {
-        final String allAnswers = actions.getForm().getAnswersSummarySupplier().apply(actions.getForm());
+        final String allAnswers = answersSummary.apply(actions.getForm());
         actions.getMessage().reply(allAnswers)
             .setEphemeral(true)
             .queue();

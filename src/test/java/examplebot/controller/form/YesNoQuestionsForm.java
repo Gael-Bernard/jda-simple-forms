@@ -2,6 +2,7 @@ package examplebot.controller.form;
 
 import fr.gbernard.jdaforms.controller.action.EditMessage;
 import fr.gbernard.jdaforms.controller.question.FormBuilder;
+import fr.gbernard.jdaforms.controller.question.summary.ValidateSummaryQuestion;
 import fr.gbernard.jdaforms.controller.question.yesno.YesNoBuilder;
 import fr.gbernard.jdaforms.controller.template.EmbedColor;
 import fr.gbernard.jdaforms.controller.template.EmbedTemplate;
@@ -40,6 +41,15 @@ public class YesNoQuestionsForm {
         .title("Do you eat healthily? :medical_symbol:")
         .build();
 
+
+    final SummaryTextProvider summaryProvider = form ->
+        "**Your great answers**: "
+            +form.getQuestionsHistory().stream()
+            .map(question -> "["+question.getSummaryTitle()+" | "+question.getAnswerOptional().orElse(null)+"]")
+            .collect(Collectors.joining());
+
+    final ValidateSummaryQuestion validateQuestion = new ValidateSummaryQuestion(summaryProvider);
+
     final FormMessageHookEditor finalMessage = (hookToMessage, form) -> {
 
       if( form.findAnswerByKey("healthy_food", Boolean.class) ) {
@@ -52,16 +62,9 @@ public class YesNoQuestionsForm {
       }
     };
 
-    final SummaryTextProvider summaryProvider = form ->
-      "**Your great answers**: "
-          +form.getQuestionsHistory().stream()
-          .map(question -> "["+question.getSummaryTitle()+" | "+question.getAnswerOptional().orElse(null)+"]")
-          .collect(Collectors.joining());
-
     return new FormBuilder()
-        .questions(List.of(question1, question2))
+        .questions(List.of(question1, question2, validateQuestion))
         .ephemeral(true)
-        .answersSummary(summaryProvider)
         .finalMessage(finalMessage)
         .build();
   }

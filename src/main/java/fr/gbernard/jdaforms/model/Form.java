@@ -1,12 +1,12 @@
 package fr.gbernard.jdaforms.model;
 
-import fr.gbernard.jdaforms.controller.defaultmessages.DefaultMessagesEditors;
-import fr.gbernard.jdaforms.controller.defaultmessages.DefaultSummary;
-import fr.gbernard.jdaforms.controller.template.MessageGlobalParams;
 import fr.gbernard.jdaforms.exception.NoAnswerException;
 import fr.gbernard.jdaforms.exception.NoCurrentQuestionException;
 import fr.gbernard.jdaforms.exception.QuestionNotFoundException;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
@@ -16,7 +16,6 @@ import java.util.Optional;
 import java.util.Stack;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Describes a form consisting of multiple questions
@@ -59,11 +58,6 @@ public class Form {
    * Whether the form should be invisible from the other users or not
    */
   private boolean ephemeral;
-
-  /**
-   * Maps an almost-complete form into a text summary of the answers
-   */
-  private @NonNull SummaryTextProvider answersSummarySupplier;
 
   /**
    * Edits the form message when the form is complete

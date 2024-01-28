@@ -1,6 +1,5 @@
 package fr.gbernard.jdaforms.feature;
 
-import fr.gbernard.jdaforms.controller.question.summary.ValidateSummaryQuestion;
 import fr.gbernard.jdaforms.model.Form;
 import fr.gbernard.jdaforms.model.Question;
 import fr.gbernard.jdaforms.repository.OngoingFormsRepository;
@@ -24,7 +23,6 @@ public class FormStartFeature {
     discordForm.getQuestionsHistory().push(question);
     discordForm.setUserId(command.getUser().getIdLong());
     discordForm.mapMandatoryQuestionsToModifiable();
-    discordForm.getMandatoryQuestions().add( new ValidateSummaryQuestion() );
     executorService.schedule(() -> {
       ongoingFormsRepository.delete(discordForm);
       command.getUser().openPrivateChannel().flatMap(
