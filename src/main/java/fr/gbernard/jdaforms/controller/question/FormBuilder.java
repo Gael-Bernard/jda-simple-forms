@@ -2,9 +2,11 @@ package fr.gbernard.jdaforms.controller.question;
 
 import fr.gbernard.jdaforms.controller.defaultmessages.DefaultMessageCreateDatas;
 import fr.gbernard.jdaforms.controller.defaultmessages.DefaultMessagesEditors;
-import fr.gbernard.jdaforms.controller.defaultmessages.DefaultSummary;
 import fr.gbernard.jdaforms.controller.template.MessageGlobalParams;
-import fr.gbernard.jdaforms.model.*;
+import fr.gbernard.jdaforms.model.Form;
+import fr.gbernard.jdaforms.model.FormAnswersMap;
+import fr.gbernard.jdaforms.model.FormMessageHookEditor;
+import fr.gbernard.jdaforms.model.Question;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -36,11 +38,6 @@ public class FormBuilder {
   private boolean ephemeral = MessageGlobalParams.DEFAULT_IS_EPHEMERAL;
 
   /**
-   * Maps an almost-complete form into a text summary of the answers
-   */
-  private @NotNull SummaryTextProvider answersSummary = DefaultSummary::buildList;
-
-  /**
    * Edits the form message when the form is complete
    */
   private @NotNull FormMessageHookEditor finalMessage = DefaultMessagesEditors.formSent();
@@ -62,7 +59,6 @@ public class FormBuilder {
     return new Form()
         .setMandatoryQuestions(questions)
         .setEphemeral(ephemeral)
-        .setAnswersSummarySupplier(answersSummary)
         .setFinalMessage(finalMessage)
         .setOnFormComplete(onFormComplete)
         .setTimeoutMessageSupplier(timeoutMessage);
