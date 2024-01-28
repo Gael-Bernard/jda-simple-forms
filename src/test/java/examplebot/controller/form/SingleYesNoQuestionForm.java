@@ -20,7 +20,7 @@ public class SingleYesNoQuestionForm {
 
     return new FormBuilder()
         .questions(List.of(question))
-        .onFormComplete((answers, completeForm) -> {
+        .onFormComplete((hook, answers, completeForm) -> {
           final boolean answer = answers.getAsBoolean("single-yes-no-question");
           System.out.println("User has selected button: "+answer);
         })
