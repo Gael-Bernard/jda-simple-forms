@@ -1,9 +1,10 @@
 package examplebot.controller.form;
 
 import examplebot.controller.dropdownitem.Vegetable;
-import fr.gbernard.jdaforms.controller.question.FormBuilder;
 import fr.gbernard.jdaforms.controller.question.dropdown.*;
 import fr.gbernard.jdaforms.model.Form;
+import v2.builder.form.FormBuilder;
+import v2.builder.form.question.StringSelectQuestionBuilder;
 
 import java.util.List;
 
@@ -11,8 +12,8 @@ public class AllDropdownQuestionsForm {
 
   public static Form createForm() {
 
+    /*
     final CustomDropdownQuestion<Vegetable> customDropdown = new CustomDropdownBuilder<Vegetable>()
-        .key("favourite-vegetable")
         .title("What are your 2-3 favourite vegetables?")
         .subtitle("We hope you eat vegetables on a daily basis for your health!")
         .choices( List.of(Vegetable.values()) )
@@ -21,14 +22,16 @@ public class AllDropdownQuestionsForm {
         .parser(Vegetable::parse)
         .build();
 
+     */
+
+    final StringSelectQuestionBuilder customDropdown = new StringSelectQuestionBuilder();
+
     final UserDropdownQuestion userDropdown = new UserDropdownBuilder()
-        .key("most-famous")
         .title("Who's the most famous here?")
         .subtitle("From your perspective, who is the most famous person in the guild?")
         .build();
 
     final ChannelDropdownQuestion channelDropdown = new ChannelDropdownBuilder()
-        .key("easter-eggs-location")
         .title("Pick where you want to leave the Easter Egg")
         .subtitle("The Easter Egg will be hidden in one of the guild's channels!")
         .minSelectedItems(2)
@@ -36,16 +39,23 @@ public class AllDropdownQuestionsForm {
         .build();
 
     final RoleDropdownQuestion roleDropdown = new RoleDropdownBuilder()
-        .key("gift")
         .title("Ask for a role as Christmas gift!")
         .subtitle("It's Christmas, which role would you like to get? (I can't promise you're getting it!)")
         .minSelectedItems(1)
         .maxSelectedItems(1)
         .build();
 
-    return new FormBuilder()
-        .questions(List.of(customDropdown, userDropdown, channelDropdown, roleDropdown))
-        .build();
+    return FormBuilder.create()
+        .firstQuestion(customDropdown) // StringSelectHandleBuilder
+        .saveStringsOnKey("favourite-vegetable") // StringSelectResponseBuilder
+        .nextQuestion(userDropdown) // UserSelectHandleBuilder
+        .saveUsersOnKey("most-famous") // EntitySelectResponseBuilder
+        .nextQuestion(channelDropdown) // ChannelSelectHandleBuilder
+        .saveChannelsOnKey("easter-eggs-location") // EntitySelectResponseBuilder
+        .nextQuestion(roleDropdown) // RoleSelectHandleBuilder
+        .saveRolesOnKey("gift") // EntitySelectResponseBuilder
+        .onComplete(OnFormCompletes.warning()); // void
+
   }
 
 }
