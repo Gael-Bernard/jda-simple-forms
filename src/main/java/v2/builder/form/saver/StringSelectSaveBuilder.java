@@ -1,14 +1,15 @@
 package v2.builder.form.saver;
 
 import lombok.AllArgsConstructor;
-import v2.builder.form.response.StringSelectResponseBuilder;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import v2.builder.form.response.ResponseBuilder;
 
 import java.util.List;
 
 @AllArgsConstructor
 public class StringSelectSaveBuilder implements AnswerSaveBuilder<List<String>> {
 
-  public StringSelectResponseBuilder saveStringsOnKey(String key) {
+  public ResponseBuilder<StringSelectInteractionEvent> saveStringsOnKey(String key) {
     throw new UnsupportedOperationException();
   }
 

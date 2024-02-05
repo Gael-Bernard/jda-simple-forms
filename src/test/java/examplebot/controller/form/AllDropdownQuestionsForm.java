@@ -1,16 +1,21 @@
 package examplebot.controller.form;
 
-import examplebot.controller.dropdownitem.Vegetable;
-import fr.gbernard.jdaforms.controller.question.dropdown.*;
-import fr.gbernard.jdaforms.model.Form;
+import fr.gbernard.jdaforms.controller.question.dropdown.ChannelDropdownBuilder;
+import fr.gbernard.jdaforms.controller.question.dropdown.ChannelDropdownQuestion;
+import fr.gbernard.jdaforms.controller.question.dropdown.RoleDropdownBuilder;
+import fr.gbernard.jdaforms.controller.question.dropdown.RoleDropdownQuestion;
+import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionEvent;
 import v2.builder.form.FormBuilder;
 import v2.builder.form.question.StringSelectQuestionBuilder;
-
-import java.util.List;
+import v2.builder.form.question.UserSelectQuestionBuilder;
+import v2.model.Form;
 
 public class AllDropdownQuestionsForm {
 
   public static Form createForm() {
+
+    final StringSelectQuestionBuilder customDropdown = new StringSelectQuestionBuilder();
+    final UserSelectQuestionBuilder userDropdown = new UserSelectQuestionBuilder();
 
     /*
     final CustomDropdownQuestion<Vegetable> customDropdown = new CustomDropdownBuilder<Vegetable>()
@@ -22,14 +27,12 @@ public class AllDropdownQuestionsForm {
         .parser(Vegetable::parse)
         .build();
 
-     */
-
-    final StringSelectQuestionBuilder customDropdown = new StringSelectQuestionBuilder();
-
     final UserDropdownQuestion userDropdown = new UserDropdownBuilder()
         .title("Who's the most famous here?")
         .subtitle("From your perspective, who is the most famous person in the guild?")
         .build();
+
+     */
 
     final ChannelDropdownQuestion channelDropdown = new ChannelDropdownBuilder()
         .title("Pick where you want to leave the Easter Egg")
@@ -46,15 +49,18 @@ public class AllDropdownQuestionsForm {
         .build();
 
     return FormBuilder.create()
-        .firstQuestion(customDropdown) // StringSelectHandleBuilder
+        .firstQuestion(customDropdown) // StringSelectSaveBuilder
         .saveStringsOnKey("favourite-vegetable") // StringSelectResponseBuilder
-        .nextQuestion(userDropdown) // UserSelectHandleBuilder
+        .nextQuestion(userDropdown) // UserSelectSaveBuilder
         .saveUsersOnKey("most-famous") // EntitySelectResponseBuilder
-        .nextQuestion(channelDropdown) // ChannelSelectHandleBuilder
+
+        /*
+        .nextQuestion(channelDropdown) // ChannelSelectSaveBuilder
         .saveChannelsOnKey("easter-eggs-location") // EntitySelectResponseBuilder
-        .nextQuestion(roleDropdown) // RoleSelectHandleBuilder
-        .saveRolesOnKey("gift") // EntitySelectResponseBuilder
-        .onComplete(OnFormCompletes.warning()); // void
+        .nextQuestion(roleDropdown) // RoleSelectSaveBuilder
+        .saveRolesOnKey("gift") // EntitySelectResponseBuilder */
+
+        .onFormComplete((EntitySelectInteractionEvent event, Form form) -> System.out.println(form)); // Form
 
   }
 

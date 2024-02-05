@@ -3,17 +3,25 @@ package v2.builder.form.response;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import v2.builder.form.question.QuestionBuilder;
 import v2.builder.form.saver.AnswerSaveBuilder;
+import v2.model.Form;
+import v2.model.functionalinterface.OnFormComplete;
 import v2.question.Question;
 
-public interface ResponseBuilder {
+public class ResponseBuilder<E extends GenericInteractionCreateEvent> {
 
-  <
-      T,
-      E extends GenericInteractionCreateEvent,
-      S extends AnswerSaveBuilder<T>,
-      Q extends Question<T,E>,
-      QB extends QuestionBuilder<T,E,S,Q>
+  public <
+      T2,
+      E2 extends GenericInteractionCreateEvent,
+      S2 extends AnswerSaveBuilder<T2>,
+      Q2 extends Question<T2,E2>,
+      QB2 extends QuestionBuilder<T2,E2,S2,Q2>
       >
-  S nextQuestion(QB question);
+  S2 nextQuestion(QB2 question) {
+    throw new UnsupportedOperationException();
+  }
+
+  public Form onFormComplete(OnFormComplete<E> handler) {
+    throw new UnsupportedOperationException();
+  }
 
 }
